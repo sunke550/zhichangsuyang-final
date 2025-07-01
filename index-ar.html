@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز الكفاءة المهنية AIEC</title>
+    
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for Icons via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+        .dark body {
+            background-color: #0f172a; /* bg-slate-900 改为稍浅一些 */
+        }
+        
+        /* Enhanced dark mode text colors for better readability */
+        .dark {
+            color: #f8fafc; /* slate-50 更亮的文字 */
+        }
+        
+        /* 主要文字颜色优化 */
+        .dark .text-slate-700 {
+            color: #f1f5f9 !important; /* slate-100 */
+        }
+        .dark .text-slate-600 {
+            color: #e2e8f0 !important; /* slate-200 */
+        }
+        .dark .text-slate-500 {
+            color: #cbd5e1 !important; /* slate-300 */
+        }
+        .dark .text-slate-400 {
+            color: #94a3b8 !important; /* slate-400 保持 */
+        }
+        .dark .text-slate-300 {
+            color: #e2e8f0 !important; /* slate-200 更亮 */
+        }
+        
+        /* 标题和重要文字 */
+        .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+            color: #ffffff !important;
+        }
+        
+        /* 卡片和容器背景优化 */
+        .dark .bg-white {
+            background-color: #1e293b !important; /* slate-800 */
+        }
+        .dark .bg-slate-100 {
+            background-color: #334155 !important; /* slate-700 */
+        }
+        .dark .bg-slate-50 {
+            background-color: #475569 !important; /* slate-600 */
+        }
+        
+        /* Smooth scrolling behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar for a modern look (optional) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #94a3b8; /* slate-400 */
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #475569; /* slate-600 */
+        }
+
+        /* Active sidebar link style */
+        .sidebar-link.active {
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: white;
+        }
+        .dark .sidebar-link.active {
+            background-color: #4f46e5;
+        }
+        
+        /* Animation for content fade-in */
+        .content-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom audio player styling */
+        audio {
+            width: 100%;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        /* Custom card hover effect */
+        .hover-card {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+        }
+        .dark .hover-card {
+            background-color: rgba(30, 41, 59, 0.8); /* slate-800 with higher opacity */
+            border-color: #475569; /* slate-600 更亮的边框 */
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            background-color: white;
+            border-color: #cbd5e1; /* slate-300 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .dark .hover-card:hover {
+            background-color: #1e293b; /* slate-800 更亮的悬停背景 */
+            border-color: #64748b; /* slate-500 更亮的悬停边框 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styles for Linear design Home */
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.1), transparent);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .dark #home::before {
+             background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.15), transparent);
+        }
+        .playbook-card {
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+        }
+        .dark .playbook-card {
+            border-color: #475569; /* slate-600 更亮的边框 */
+            background-color: rgba(30, 41, 59, 0.6); /* 稍微透明的背景 */
+        }
+        .playbook-card:hover {
+            background-color: white;
+            border-color: #cbd5e1; /* slate-300 */
+            transform: translateY(-4px);
+        }
+        .dark .playbook-card:hover {
+            background-color: #1e293b; /* slate-800 更亮的悬停背景 */
+            border-color: #64748b; /* slate-500 更亮的悬停边框 */
+        }
+
+        /* Accordion for FAQ and Sidebar*/
+        .accordion-item .accordion-header, .nav-accordion button {
+            cursor: pointer;
+        }
+        .accordion-item .accordion-content, .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out;
+        }
+        .nav-accordion.open .submenu {
+            max-height: 500px; /* A value larger than the content height */
+        }
+        .nav-accordion.open button .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        
+        /* Flywheel diagram styles */
+        .flywheel { display: flex; justify-content: center; align-items: center; position: relative; width: 300px; height: 300px; margin: 2rem auto;}
+        .flywheel-center { width: 100px; height: 100px; background-color: #4f46e5; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-align:center; font-weight: bold; z-index: 10; font-size: 0.9rem; padding: 0.5rem;}
+        .flywheel-item { position: absolute; width: 100px; text-align: center; }
+        .flywheel-item-1 { top: 0; left: 50%; transform: translateX(-50%) translateY(-20%); }
+        .flywheel-item-2 { top: 50%; right: 0; transform: translateY(-50%) translateX(20%); }
+        .flywheel-item-3 { bottom: 0; left: 50%; transform: translateX(-50%) translateY(20%); }
+        .flywheel-item-4 { top: 50%; left: 0; transform: translateY(-50%) translateX(-20%); }
+        .flywheel svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; transform: rotate(-45deg); }
+        .flywheel svg circle { fill: none; stroke: #e2e8f0; stroke-width: 2; stroke-dasharray: 5; animation: spin 20s linear infinite; }
+        .dark .flywheel svg circle { stroke: #334155; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Playlist styles */
+        .playlist-item {
+            cursor: pointer;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .dark .playlist-item {
+            border-color: #475569; /* slate-600 更亮的边框 */
+            background-color: rgba(30, 41, 59, 0.4); /* 稍微透明的背景 */
+        }
+        .playlist-item:hover {
+            background-color: #f1f5f9; /* slate-100 */
+            border-color: #cbd5e1; /* slate-300 */
+        }
+        .dark .playlist-item:hover {
+             background-color: #1e293b; /* slate-800 更亮的悬停背景 */
+            border-color: #64748b; /* slate-500 更亮的悬停边框 */
+        }
+        .playlist-item.active {
+            background-color: #eef2ff; /* indigo-50 */
+            border-color: #4f46e5; /* indigo-600 */
+        }
+        .dark .playlist-item.active {
+            background-color: rgba(79, 70, 229, 0.2); /* 更明显的激活状态 */
+            border-color: #6366f1; /* indigo-500 更亮 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-100">
+
+    <div class="flex">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 right-0 bg-white dark:bg-slate-900 w-64 p-6 flex flex-col transform translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 border-l border-slate-200 dark:border-slate-700">
+            <div class="flex items-center space-x-3 mb-10">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white">مركز كفاءة AIEC</h1>
+            </div>
+            
+            <nav class="flex-grow">
+                <ul class="space-y-2" id="sidebar-nav">
+                    <li><a href="#home" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200 active"><i class="fas fa-home w-6"></i><span>الصفحة الرئيسية</span></a></li>
+                    
+                    <!-- Accordion Menu -->
+                    <li class="nav-accordion">
+                        <button class="w-full flex items-center justify-between p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-book-open w-6"></i>
+                                <span>الكفاءة المهنية للفريق</span>
+                            </div>
+                            <i class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                        </button>
+                        <ul class="submenu mt-2 space-y-1 pl-4">
+                            <li><a href="#strategy" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-map-signs w-6 text-slate-500 dark:text-slate-300"></i><span>مخطط التطور الاستراتيجي</span></a></li>
+                            <li><a href="#newcomer" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-user-graduate w-6 text-slate-500 dark:text-slate-300"></i><span>الموظف الجديد: استجب لكل شيء</span></a></li>
+                            <li><a href="#principles" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-cogs w-6 text-slate-500 dark:text-slate-300"></i><span>مبدأ العمل الأول</span></a></li>
+                            <li><a href="#growth_pillars" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-monument w-6 text-slate-500 dark:text-slate-300"></i><span>الأركان الأربعة للنمو</span></a></li>
+                            <li><a href="#growth_model" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-sitemap w-6 text-slate-500 dark:text-slate-300"></i><span>نموذج نمو الفريق</span></a></li>
+                            <li><a href="#product_dev" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-cubes w-6 text-slate-500 dark:text-slate-300"></i><span>بناء المنتج العلمي</span></a></li>
+                            <li><a href="#mindset" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-anchor w-6 text-slate-500 dark:text-slate-300"></i><span>فلسفة المنظمة</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#aiec-fm" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-broadcast-tower w-6"></i><span>إذاعة AIEC 📻</span></a></li>
+                </ul>
+            </nav>
+
+            <!-- Language Switcher -->
+            <div class="mt-auto space-y-3">
+                <button id="language-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 border border-indigo-200 dark:border-indigo-800">
+                    <i class="fas fa-language text-indigo-600 dark:text-indigo-400"></i>
+                    <span class="mr-3 text-sm font-medium text-indigo-700 dark:text-indigo-300">النسخة الصينية</span>
+                </button>
+                
+                <!-- Theme Switcher -->
+                 <button id="theme-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200">
+                    <i id="theme-icon" class="fas text-slate-500"></i>
+                    <span class="mr-3 text-sm font-medium text-slate-600 dark:text-slate-200">تبديل الوضع</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="mr-0 md:mr-64 w-full p-6 sm:p-8 lg:p-12 transition-all duration-300 ease-in-out">
+             <!-- Mobile Header -->
+            <header class="md:hidden flex items-center justify-between mb-6">
+                 <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 p-2 rounded-lg">
+                        <i class="fas fa-brain text-white"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-slate-900 dark:text-white">مركز كفاءة AIEC</h1>
+                </div>
+                <button id="menu-toggle" class="p-2 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </header>
+
+            <!-- Section 0: Home Page -->
+            <section id="home" class="content-section min-h-screen pt-16 flex flex-col justify-center relative">
+                <div class="text-center z-10">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+                        دليل <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-500">AIEC</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-300">
+                        دليل نمو فريق يُحدث ديناميكيًا، يهدف إلى مساعدة كل عضو على التكيف بسهولة مع التغيير وبناء الثقة في المجهول من خلال مسارات آلية ومهنية.
+                    </p>
+                    <div class="mt-8">
+                        <a href="#newcomer" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-500/30">
+ابدأ من "كفاءة الموظف الجديد" <i class="fas fa-arrow-left ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-20 z-10">
+                     <div class="text-center mb-8">
+                        <h2 class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 tracking-widest uppercase">المبادئ الأساسية</h2>
+                        <p class="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100">استكشف طريقتنا في العمل والنمو</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <a href="#strategy" class="playbook-card group block p-6 bg-white/50 dark:bg-slate-900/50 rounded-xl">
+                            <div class="flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/50 rounded-lg w-12 h-12 mb-4">
+                               <i class="fas fa-map-signs text-xl text-indigo-600 dark:text-indigo-400"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100">مخطط التطور الاستراتيجي</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">طريق التطور من "مدرب AI" إلى "محرك استراتيجي".</p>
+                        </a>
+                        <a href="#newcomer" class="playbook-card group block p-6 bg-white/50 dark:bg-slate-900/50 rounded-xl">
+                            <div class="flex items-center justify-center bg-sky-100 dark:bg-sky-900/50 rounded-lg w-12 h-12 mb-4">
+                               <i class="fas fa-user-graduate text-xl text-sky-600 dark:text-sky-400"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100">كفاءة الموظف الجديد</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">إتقان المستويات الأربعة لـ "الاستجابة لكل شيء".</p>
+                        </a>
+                         <a href="#growth_pillars" class="playbook-card group block p-6 bg-white/50 dark:bg-slate-900/50 rounded-xl">
+                            <div class="flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/50 rounded-lg w-12 h-12 mb-4">
+                               <i class="fas fa-monument text-xl text-emerald-600 dark:text-emerald-400"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100">الأركان الأربعة للنمو</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">بناء نظام نمو بيئي بأربع عجلات محركة.</p>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Strategic Evolution Blueprint -->
+            <section id="strategy" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">مخطط التطور الاستراتيجي لـ AIEC</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">من "مدرب AI" إلى "محرك استراتيجي"، نقود 51Talk في ركوب الأمواج في عصر AI.</p>
+                <audio controls src="阿拉伯语音频/AI效率中心战略蓝图.wav"></audio>
+                
+                <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-indigo-500 flex items-center"><i class="fas fa-sitemap mr-3"></i>خط العمل الأول: رقمنة المؤسسة بـ AI</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-4">التعمق الداخلي، ممارسة المهارات الداخلية. من التدريب المتناثر على المهارات إلى رقمنة المؤسسة النظامية بـ AI، تحقيق التكامل العميق على ثلاثة مستويات:</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><i class="fas fa-user-astronaut text-indigo-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">AI الفردي الأصلي:</strong> AI يصبح "العقل الثاني" و"الإضافة الفعالة" للموظف.</span></li>
+                            <li class="flex items-start"><i class="fas fa-link text-indigo-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">التعاون المُحسَّن بـ AI:</strong> AI يصبح "الرابط الفائق" غير المرئي بين الفرق.</span></li>
+                            <li class="flex items-start"><i class="fas fa-cogs text-indigo-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">تحول العمليات بـ AI:</strong> AI يندمج بعمق في العمليات الأساسية، محققاً الابتكار الثوري.</span></li>
+                        </ul>
+                    </div>
+                     <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-teal-500 flex items-center"><i class="fas fa-chart-line mr-3"></i>خط العمل الثاني: التسويق التجاري</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-4">تمكين الأعمال، مغامرة في السوق. استخدام التمكين الداخلي كميدان تدريب نحو التسويق التجاري الخارجي، صقل ثلاث قدرات أساسية:</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><i class="fas fa-handshake text-teal-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">قدرة اكتساب العملاء:</strong> تمرين رؤى السوق، استكشاف الاحتياجات، تسويق الحلول.</span></li>
+                            <li class="flex items-start"><i class="fas fa-box-open text-teal-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">قدرة التسليم:</strong> تمرين إدارة المشاريع، تسليم المنتجات، نجاح العملاء.</span></li>
+                            <li class="flex items-start"><i class="fas fa-sync-alt text-teal-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">قدرة الخدمة:</strong> تمرين خدمة ما بعد البيع، تطوير المنتج، تجديد القيمة.</span></li>
+                        </ul>
+                    </div>
+                </div>
+                 <blockquote class="mt-8 border-l-4 border-violet-500 p-4 bg-violet-50 dark:bg-slate-800/50 rounded-r-lg">
+                    <p class="font-medium italic text-slate-700 dark:text-slate-200"><i class="fas fa-lightbulb mr-2"></i>عجلة النمو الأساسية: <strong class="text-violet-600 dark:text-violet-400">إذا كانت المهارات الداخلية قوية، فإن طريق السوق بعيد؛ وإذا كان السوق واسع، فإن المهارات الداخلية أكثر دقة.</strong> خطا العمل يتفاعلان معاً كسبب ونتيجة، يدفعان نمو الفريق معاً.</p>
+                </blockquote>
+            </section>
+            
+            <!-- Section 2: Newcomer's Guide -->
+            <section id="newcomer" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🎒 كفاءة الموظف الجديد: الاستجابة لكل شيء</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">"الاستجابة" هي حجر الأساس للمهنية والثقة والكفاءة. إنها حلقة مغلقة كاملة من 60 إلى 100 نقطة، إلى أي مرحلة وصلت؟</p>
+                 <audio controls src="阿拉伯语音频/职场回应力：新人快速升级指南 (1).wav"></audio>
+                <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-indigo-500 text-2xl mb-3 font-bold">نجح</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">الاستجابة الأساسية</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>الصيغة:</strong> تم الاستلام + الوقت المتوقع للإنجاز.<br>"تم الاستلام، سأقوم بإنجازه قبل الساعة 3 مساءً."</p>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-sky-500 text-2xl mb-3 font-bold">ممتاز</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">التوضيح الاستباقي</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>الطريقة:</strong> استخدام أسئلة 5W1H، تجنب العمل غير المفيد.<br>"من فضلك، لأي قرار ستُستخدم هذه السيرة الذاتية بشكل أساسي؟"</p>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-amber-500 text-2xl mb-3 font-bold">مهني</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">مزامنة العملية</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>الطريقة:</strong> لا تدع القائد يعيش في المجهول.<br>"سألت عدة متاجر وكلها نفدت المخزون، أتواصل الآن مع الموزع."</p>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-emerald-500 text-2xl mb-3 font-bold">متفوق</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">حلقة النتائج المغلقة</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>الطريقة:</strong> تسليم القيمة، وليس إنجاز المهام فقط.<br>"تم شراء ماوتاي، وبالإضافة إلى ذلك وجدت قناة XX أكثر أفضلية، تم تنظيمها في وثيقة."</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-xl font-bold mb-4 text-center text-slate-800 dark:text-slate-100">الأسئلة الشائعة للموظفين الجدد (FAQ)</h3>
+                    <div class="space-y-4 max-w-3xl mx-auto" id="faq-accordion">
+                        <!-- FAQ items will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: First Working Principle -->
+            <section id="principles" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🔧 مبدأ العمل الأول: الآلية أفضل من النية</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">"النية الحسنة لا تعمل، الآلية تعمل." جوهر عملنا هو استبدال "النية" غير المستقرة بـ "الآلية" الموثوقة.</p>
+                 <audio controls src="阿拉伯语音频/阿拉伯语 机制.wav"></audio>
+                <div class="mt-12 hover-card p-8 rounded-xl">
+                    <h3 class="font-bold text-xl mb-4 text-center text-slate-800 dark:text-slate-100">لماذا نلتزم بـ "القيادة الآلية"؟</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div><i class="fas fa-check-circle text-3xl text-green-500 mb-2"></i><h4 class="font-semibold text-slate-800 dark:text-slate-100">ضمان النتائج</h4><p class="text-sm text-slate-600 dark:text-slate-400">ضمان تنفيذ المهام الرئيسية بنسبة 100%، وليس "اعتقدت أنني سأفعل ذلك".</p></div>
+                        <div><i class="fas fa-heart-broken text-3xl text-red-500 mb-2"></i><h4 class="font-semibold text-slate-800 dark:text-slate-100">القضاء على الاستنزاف الداخلي</h4><p class="text-sm text-slate-600 dark:text-slate-400">تحرير الفريق من العمل العاطفي مثل "هل يجب أن أذكره؟".</p></div>
+                        <div><i class="fas fa-expand-arrows-alt text-3xl text-blue-500 mb-2"></i><h4 class="font-semibold text-slate-800 dark:text-slate-100">تحقيق قابلية التوسع</h4><p class="text-sm text-slate-600 dark:text-slate-400">فقط الآليات قابلة للتكرار، الأنماط التي تعتمد على النية الشخصية لا يمكنها التوسع.</p></div>
+                    </div>
+                    <div class="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <h4 class="font-semibold text-lg mb-4 text-center text-slate-800 dark:text-slate-100">استيعاب المبادئ كذاكرة عضلية</h4>
+                         <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                            <div class="flex-1 text-center p-4 bg-slate-100 dark:bg-slate-800 rounded-lg"><strong class="text-indigo-500">1. تحديد "نقاط النية"</strong><p class="text-sm text-slate-600 dark:text-slate-400">أي الخطوات لا تزال تعتمد على "أتذكر"؟</p></div>
+                            <i class="fas fa-arrow-left text-slate-400 hidden md:block"></i>
+                             <i class="fas fa-arrow-down text-slate-400 md:hidden"></i>
+                            <div class="flex-1 text-center p-4 bg-slate-100 dark:bg-slate-800 rounded-lg"><strong class="text-indigo-500">2. تصميم "الآلية"</strong><p class="text-sm text-slate-600 dark:text-slate-400">هل يمكن استبدالها بـ SOP أو قوالب أو أتمتة؟</p></div>
+                             <i class="fas fa-arrow-left text-slate-400 hidden md:block"></i>
+                             <i class="fas fa-arrow-down text-slate-400 md:hidden"></i>
+                            <div class="flex-1 text-center p-4 bg-slate-100 dark:bg-slate-800 rounded-lg"><strong class="text-indigo-500">3. "منتجة" الآلية</strong><p class="text-sm text-slate-600 dark:text-slate-400">ترسيخها ومشاركتها، لتصبح أصولاً عامة للفريق.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 4: Four Pillars of Growth -->
+            <section id="growth_pillars" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🏛️ الأركان الأربعة لتسريع نمو الأعضاء</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">بناء نظام نمو بيئي بأربع محركات، يسمح لكل شخص بالحصول على التغذية من أربعة أبعاد، وتحقيق نمو أسي.</p>
+                 <audio controls src="阿拉伯语音频/AIEC团队成员成长四大支柱.wav"></audio>
+                <div class="mt-12 grid md:grid-cols-2 gap-6">
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-indigo-500 flex items-center"><i class="fas fa-tasks w-8"></i>المشاريع المسؤولة</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>ما هي:</strong> مشاريع حلقة مغلقة من البداية إلى النهاية تحت مسؤوليتك المستقلة.<br><strong>لماذا مهمة:</strong> المسار الوحيد لتحويل المعرفة إلى قدرة، وتنمية الشعور بالملكية.</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>تولِّ بنشاط، اخرج من منطقة الراحة</li><li>فكر بطريقة حلقة مغلقة، ركز على السلسلة الكاملة</li><li>مراجعة دورية، ترسيخ الخبرة</li></ul>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-sky-500 flex items-center"><i class="fas fa-compass w-8"></i>الإرشاد المتقدم</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>ما هو:</strong> إرشاد الخبرة ونماذج التفكير المقدم من الأعضاء المتقدمين.<br><strong>لماذا مهم:</strong> يوفر منظوراً عالي الأبعاد، يساعدك على تجنب "الحفر"، مورد ثمين.</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>احضر المشاكل والحلول معك</li><li>ركز على "لماذا"، وليس "الإجابة المعيارية"</li><li>احجز بنشاط، لا تنتظر</li></ul>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-amber-500 flex items-center"><i class="fas fa-robot w-8"></i>تمكين AI</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>ما هو:</strong> دمج AI بعمق في العمل اليومي وعمليات التعلم.<br><strong>لماذا مهم:</strong> الرافعة الفائقة لهذا العصر، مستشار من الدرجة الأولى على مدار الساعة طوال أيام الأسبوع.</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>AI أولاً، كسر الجمود</li><li>كن "قائد" AI، اتقن طرح الأسئلة</li><li>استخدم AI للكتابة والتحليل والعصف الذهني</li></ul>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-emerald-500 flex items-center"><i class="fas fa-users w-8"></i>التعلم المتبادل</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>ما هو:</strong> مشاركة المعرفة المتساوية والثنائية الاتجاه وحل المشاكل الصعبة معاً.<br><strong>لماذا مهم:</strong> وجهات نظر متكاملة، تعلم في منطقة آمنة، التعلم والتعليم متبادلان.</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>ابدأ المشاركة بنشاط</li><li>إنشاء مجموعات دراسية (Study Buddy)</li><li>المراجعة المتقاطعة (Peer Review)</li></ul>
+                    </div>
+                </div>
+                 <div class="flywheel text-slate-600 dark:text-slate-400">
+                    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/></svg>
+                    <div class="flywheel-center">قفزة<br>القدرات</div>
+                    <div class="flywheel-item flywheel-item-1"><i class="fas fa-tasks text-indigo-500 text-2xl mb-1"></i><p class="text-xs">المشاريع المسؤولة</p></div>
+                    <div class="flywheel-item flywheel-item-2"><i class="fas fa-robot text-amber-500 text-2xl mb-1"></i><p class="text-xs">تمكين AI</p></div>
+                    <div class="flywheel-item flywheel-item-3"><i class="fas fa-users text-emerald-500 text-2xl mb-1"></i><p class="text-xs">التعلم المتبادل</p></div>
+                    <div class="flywheel-item flywheel-item-4"><i class="fas fa-compass text-sky-500 text-2xl mb-1"></i><p class="text-xs">الإرشاد المتقدم</p></div>
+                </div>
+            </section>
+            
+            <!-- Section 5: Team Growth Model -->
+            <section id="growth_model" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">📈 نموذج نمو فريق AIEC</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">عقدنا الأساسي هو "تبادل القيمة"، وموقعنا الاستراتيجي الثابت هو بيئة "نمو".</p>
+                 <audio controls src="阿拉伯语音频/AIEC团队成长模型：价值交换与环境策略.wav"></audio>
+                <div class="mt-12 grid lg:grid-cols-5 gap-8 items-center">
+                    <div class="lg:col-span-2 space-y-6">
+                        <h3 class="font-bold text-xl text-indigo-500">العقد الأساسي: تبادل القيمة العادل</h3>
+                        <div class="hover-card p-6 rounded-xl">
+                            <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">1. تحديد مستوى الاستثمار ذاتياً</h4>
+                            <p class="text-slate-600 dark:text-slate-300">أنت سيد وقتك وطاقتك. الفريق هو <strong class="text-green-500">"صالة رياضية"</strong> مجهزة تجهيزاً جيداً، وليس <strong class="text-red-500">"خط إنتاج"</strong> محدد السرعة. لا نفرض العمل الإضافي القسري، ونرفض المنافسة غير المجدية.</p>
+                        </div>
+                        <div class="hover-card p-6 rounded-xl">
+                            <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">2. تكافؤ السبب والنتيجة الواضح</h4>
+                            <p class="text-slate-600 dark:text-slate-300">الاستثمار والعائد متناسبان. صعوبة المشاكل التي تحلها وحجم المسؤولية التي تتحملها، ستحدد مباشرة <strong class="text-indigo-400">سرعة نموك والفرص الأساسية والاعتراف بالقيمة</strong> التي تحصل عليها.</p>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 p-6 hover-card rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-center text-slate-800 dark:text-slate-100">أربعة أرباع بيئة النمو</h3>
+                        <div class="relative grid grid-cols-2 grid-rows-2 gap-1 bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full text-center text-sm text-slate-500 dark:text-slate-400"><span>جاد بقوة <i class="fas fa-long-arrow-alt-left"></i></span></div>
+                            <div class="absolute top-1/2 right-0 translate-x-full -translate-y-1/2 text-center text-sm text-slate-500 dark:text-slate-400" style="writing-mode: vertical-rl;"><span class="mx-auto">نوع النمو <i class="fas fa-long-arrow-alt-up"></i></span></div>
+                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="w-px h-full bg-slate-300 dark:bg-slate-700"></div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="h-px w-full bg-slate-300 dark:bg-slate-700"></div>
+                            </div>
+                            <div class="p-4 text-center"><p class="font-semibold text-green-500">حاضنة الإمكانات العالية</p><p class="text-xs text-slate-600 dark:text-slate-400">بيئتنا الافتراضية</p></div>
+                            <div class="p-4 text-center"><p class="font-semibold text-blue-500">معسكر تدريب النخبة</p><p class="text-xs text-slate-600 dark:text-slate-400">المسار السريع المُعدّ لك</p></div>
+                            <div class="p-4 text-center"><p class="font-semibold text-slate-500">دار المسنين</p></div>
+                            <div class="p-4 text-center"><p class="font-semibold text-red-500">مصنع العرق والدم</p></div>
+                        </div>
+                        <p class="text-sm mt-4 text-center text-slate-600 dark:text-slate-400">اختيارنا الاستراتيجي هو ربع <strong class="text-green-500">"النمو"</strong>، افتراضياً هو <strong class="text-green-500">"حاضنة الإمكانات العالية"</strong>، ونوفر المفتاح إلى <strong class="text-blue-500">"معسكر تدريب النخبة"</strong>.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 6: Product Development Paradigm -->
+            <section id="product_dev" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🔬 نموذج جديد لبناء انضباط المنتج</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">تخلَّ عن "الخبرة الحالية"، احتضن "زيادة AI". المبدأ الأساسي: <strong class="text-indigo-500">الأشياء الصعبة، يقوم بها من يجيد AI</strong>.</p>
+                 <audio controls src="阿拉伯语音频/AI时代：组织变革与产品学科化.wav"></audio>
+                <div class="mt-12 hover-card p-8 rounded-xl">
+                    <h3 class="font-bold text-xl mb-4 text-center text-slate-800 dark:text-slate-100">طريقة التفكيك ثلاثي المحاور: بناء نظام انضباط المنتج بشكل منهجي</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                         <div class="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-cogs text-4xl text-sky-500 mb-3"></i><h4 class="font-semibold text-lg text-slate-800 dark:text-slate-100">محور المهارات (Skill)</h4><p class="text-sm text-slate-600 dark:text-slate-400">عضلات وعظام القدرة المهنية. مثل بحوث المستخدم، تصميم المنتج، هندسة النصوص التوجيهية.</p>
+                        </div>
+                        <div class="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-tools text-4xl text-amber-500 mb-3"></i><h4 class="font-semibold text-lg text-slate-800 dark:text-slate-100">محور الأدوات (Tool)</h4><p class="text-sm text-slate-600 dark:text-slate-400">ترسانة الأسلحة لتحقيق المهارات، خاصة أدوات AI.</p>
+                        </div>
+                        <div class="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-bullseye text-4xl text-emerald-500 mb-3"></i><h4 class="font-semibold text-lg text-slate-800 dark:text-slate-100">محور السيناريو (Scenario)</h4><p class="text-sm text-slate-600 dark:text-slate-400">ساحة المعركة النهائية لخلق القيمة. مثل إنتاج المواد التعليمية، تصميم صفحات الهبوط.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 grid md:grid-cols-2 gap-8">
+                     <div class="hover-card p-6 rounded-xl">
+                        <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100"><i class="fas fa-user-ninja mr-2"></i>لكل موظف:</h4>
+                        <ul class="text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside"><li>احتضن AI، كن "شخصاً يتقن AI"، هذا مطلب إجباري.</li><li>من "منفذ" إلى "مالك"، اجرؤ على تحمل الأشياء "الصعبة".</li><li>تعلم التفكير والإخراج المنظم، بسّط المشاكل المعقدة.</li></ul>
+                     </div>
+                     <div class="hover-card p-6 rounded-xl">
+                        <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100"><i class="fas fa-crown mr-2"></i>لكل مدير:</h4>
+                         <ul class="text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside"><li>تعلم "إلقاء المسؤولية بأناقة"، ثق وفوّض للمرؤوسين الذين لديهم قدرات AI.</li><li>من "إدارة الأشياء" إلى "إدارة الأشخاص" و"التمكين"، أطلق إمكانات الفريق.</li><li>كن "مكاملاً"، اربط النقاط والخطوط والسطوح، اجمع القوى.</li></ul>
+                     </div>
+                </div>
+            </section>
+            
+            <!-- Section 7: Organizational Mindset -->
+            <section id="mindset" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">💖 فلسفة التنظيم: الحفاظ على الاستقرار في التغيير</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">مركز كفاءة AI يبحر في قارة جديدة مجهولة. شرط احتضان التغيير هو التعرف على التغيير، وثقة عبور العواصف هي التمسك بما لا يتغير.</p>
+                 <audio controls src="阿拉伯语音频/Navigating AI_ Embrace Change, Build Trust (2).wav"></audio>
+                <div class="mt-12 grid lg:grid-cols-2 gap-8">
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-orange-500"><i class="fas fa-exchange-alt mr-2"></i>ثلاثة أشياء ستتغير حتماً في المستقبل (متغيرات)</h3>
+                        <div class="space-y-4 text-slate-600 dark:text-slate-300">
+                           <p><i class="fas fa-users-cog w-6 text-orange-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">الفريق وطرق العمل:</strong> تقسيم العمل وعمليات التعاون لدينا ستستمر في التطوير، يرجى البقاء منفتحاً ومرناً.</p>
+                           <p><i class="fas fa-lightbulb w-6 text-orange-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">الإدراك ومسارات اتخاذ القرار:</strong> نحن نستكشف في "المنطقة المجهولة"، الاستراتيجية والقرارات ستتم مراجعتها بمرونة، تجريب سريع للأخطاء.</p>
+                           <p><i class="fas fa-globe-americas w-6 text-orange-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">البيئة الخارجية والإيقاع الاستراتيجي:</strong> السوق واستراتيجية الشركة قد تجلب صدمات، هذه هي طبيعة الأعمال.</p>
+                        </div>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-green-500"><i class="fas fa-anchor mr-2"></i>مبدآن ثابتان لا نحيد عنهما (ثوابت)</h3>
+                        <div class="space-y-4 text-slate-600 dark:text-slate-300">
+                           <p><i class="fas fa-wind w-6 text-green-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">عقلية الفريق الثابتة:</strong> احتضان عدم اليقين بنشاط، تحويل شكوى "لماذا تغير مرة أخرى؟" إلى تفكير "ما هي الفرص الجديدة؟".</p>
+                           <p><i class="fas fa-bullhorn w-6 text-green-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">التزام القيادة الثابت:</strong> شفافية مطلقة حول "لماذا"، رفض ثقافة "الإنسان الأداة"، إثارة الشعور بالملكية، بناء ثقة عميقة.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: AIEC FM -->
+            <section id="aiec-fm" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">AIEC FM 📻</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">مجموعة مختارة من فلسفات الفريق الأساسية، للاستماع في أي وقت وأي مكان، استيعاب مسار النمو.</p>
+                
+                <div id="main-player-card" class="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 mb-8 sticky top-4 z-20">
+                     <div class="flex items-center mb-4">
+                        <div id="player-icon-container" class="bg-indigo-100 dark:bg-indigo-900/50 rounded-lg w-16 h-16 flex items-center justify-center mr-4">
+                            <i id="player-icon" class="fas fa-headphones-alt text-3xl text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h3 id="player-title" class="font-bold text-xl text-slate-800 dark:text-slate-100">يرجى اختيار حلقة للاستماع</h3>
+                            <p id="player-description" class="text-sm text-slate-600 dark:text-slate-400">انقر على القائمة أدناه لبدء التشغيل</p>
+                        </div>
+                    </div>
+                    <audio id="main-audio-player" controls src="audio/blueprint.wav"></audio>
+                </div>
+
+                <div id="playlist" class="space-y-4">
+                    <!-- Playlist items will be injected by JS -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Elements ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const languageToggle = document.getElementById('language-toggle');
+            const html = document.documentElement;
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+            const faqContainer = document.getElementById('faq-accordion');
+            
+            // --- Player Elements ---
+            const mainAudioPlayer = document.getElementById('main-audio-player');
+            const playerTitle = document.getElementById('player-title');
+            const playerDescription = document.getElementById('player-description');
+            const playerIcon = document.getElementById('player-icon');
+            const playlistContainer = document.getElementById('playlist');
+
+            // --- Data ---
+            const faqs = [
+                { q: "هل الإبلاغ اليومي يجعلني أبدو عاجزاً وأحتاج لمراقبة؟", a: "العكس تماماً! الإبلاغ الاستباقي يُظهر أن لديك شعوراً بالمسؤولية ونظرة شاملة. الأشخاص الأقوياء يفهمون أكثر أهمية جعل العمل شفافاً. تذكر: الشفافية ≠ العجز، بل المهنية." },
+                { q: "أرسلت تقريراً، والقائد لا يرد أبداً، هل فعلت شيئاً خاطئاً؟", a: "عدم الرد غالباً يعني الموافقة! عدم رد القائد عادة له ثلاث حالات: ①راضٍ عن تقريرك؛ ②مشغول جداً للرد؛ ③أصبح عادة. استمر في ذلك، الموافقة الصامتة هي أفضل موافقة." },
+                { q: "أسئلتي كثيرة، هل سيبدو أن أفكاري غير واضحة؟", a: "الأسئلة الذكية أفضل من عدم السؤال! الأسئلة الجيدة تُظهر أنك تفكر. المفتاح هو طرح أسئلة قيّمة (مثل الاختيار بين اثنين)، وليس 'ماذا يجب أن أفعل؟'." },
+                { q: "القائد قال 'تصرف كما تراه مناسباً'، هل أحتاج للتوضيح؟", a: "نعم! 'تصرف كما تراه مناسباً' غالباً ما يكون سؤال اختبار. يمكن الرد: 'حسناً، فهمي هو [خطتك]، إذا كان هناك انحراف فأخبرني.' هذا يُظهر قوة التفكير ويتجنب المخاطر." },
+                { q: "هل الإبلاغ عن الصعوبات يكشف نقص قدرتي؟", a: "الكشف المبكر عن المشاكل هو إظهار للقدرة القوية! إخفاء المشاكل حتى الانفجار الأخير هو ما يُظهر نقص القدرة. الطريقة الصحيحة هي: اكتشاف المشكلة → تحليل السبب → اقتراح حل → طلب الدعم." },
+                { q: "عند التعاون بين الأقسام، الطرف الآخر لا يرد على رسائلي، ماذا أفعل؟", a: "①تأكد من استلام الطرف الآخر للرسالة ②أرسل نسخة للقادة المعنيين ③حدد مهلة زمنية معقولة ④اتصل هاتفياً بشكل استباقي. تذكر: مهنيتك لا يجب أن تنخفض بسبب عدم مهنية الآخرين." },
+            ];
+
+            const playlistData = [
+                { id: "strategy", title: "مخطط التطور الاستراتيجي", description: "من مدرب AI إلى محرك استراتيجي", icon: "fa-map-signs", audioSrc: "阿拉伯语音频/AI效率中心战略蓝图.wav" },
+                { id: "newcomer", title: "كفاءة الموظف الجديد", description: "إتقان المستويات الأربعة للاستجابة لكل شيء", icon: "fa-user-graduate", audioSrc: "阿拉伯语音频/职场回应力：新人快速升级指南 (1).wav" },
+                { id: "principles", title: "مبدأ العمل الأول", description: "الآلية أفضل من النية", icon: "fa-cogs", audioSrc: "阿拉伯语音频/阿拉伯语 机制.wav" },
+                { id: "growth_pillars", title: "الأركان الأربعة للنمو", description: "بناء نظام نمو بيئي بأربع عجلات محركة", icon: "fa-monument", audioSrc: "阿拉伯语音频/AIEC团队成员成长四大支柱.wav" },
+                { id: "growth_model", title: "نموذج نمو الفريق", description: "حول تبادل القيمة وبيئة النمو", icon: "fa-sitemap", audioSrc: "阿拉伯语音频/AIEC团队成长模型：价值交换与环境策略.wav" },
+                { id: "product_dev", title: "بناء الانضباط في تطوير المنتجات", description: "تخلَّ عن الخبرة الحالية، احتضن زيادة AI", icon: "fa-cubes", audioSrc: "阿拉伯语音频/AI时代：组织变革与产品学科化.wav" },
+                { id: "mindset", title: "فلسفة المؤسسة", description: "الحفاظ على الاستقرار في التغيير", icon: "fa-anchor", audioSrc: "阿拉伯语音频/Navigating AI_ Embrace Change, Build Trust (2).wav" }
+            ];
+            
+            // --- Initialize Player & Playlist ---
+            function setupPlayer() {
+                if (!playlistContainer) return;
+
+                playlistContainer.innerHTML = playlistData.map(track => `
+                    <div class="playlist-item p-4 rounded-lg flex items-center" data-src="${track.audioSrc}" data-title="${track.title}" data-description="${track.description}" data-icon="${track.icon}">
+                        <div class="bg-slate-100 dark:bg-slate-800 rounded-md w-12 h-12 flex items-center justify-center mr-4">
+                            <i class="fas ${track.icon} text-slate-500 text-xl"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100">${track.title}</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">${track.description}</p>
+                        </div>
+                        <div class="play-indicator ml-4">
+                            <i class="fas fa-play-circle text-2xl text-slate-400 dark:text-slate-600"></i>
+                        </div>
+                    </div>
+                `).join('');
+
+                const playlistItems = document.querySelectorAll('.playlist-item');
+                playlistItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const src = this.dataset.src;
+                        const title = this.dataset.title;
+                        const description = this.dataset.description;
+                        const iconClass = this.dataset.icon;
+
+                        // Update main player
+                        mainAudioPlayer.src = src;
+                        playerTitle.textContent = title;
+                        playerDescription.textContent = description;
+                        playerIcon.className = `fas ${iconClass} text-3xl text-indigo-600 dark:text-indigo-400`;
+
+                        // Update UI states
+                        playlistItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Update play icons
+                        document.querySelectorAll('.play-indicator i').forEach(i => {
+                            i.className = 'fas fa-play-circle text-2xl text-slate-400 dark:text-slate-600';
+                        });
+                        this.querySelector('.play-indicator i').className = 'fas fa-volume-up text-2xl text-indigo-500';
+                        
+                        mainAudioPlayer.load();
+                        mainAudioPlayer.play();
+                    });
+                });
+            }
+
+
+            // --- Inject FAQs into Accordion ---
+            if(faqContainer) {
+                faqContainer.innerHTML = faqs.map((faq, index) => `
+                    <div class="accordion-item bg-white dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <div class="accordion-header flex justify-between items-center p-4">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-200">${faq.q}</h4>
+                            <i class="fas fa-chevron-down text-slate-500 transition-transform"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="p-4 pt-0 text-slate-700 dark:text-slate-300">${faq.a}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const content = header.nextElementSibling;
+                        const icon = header.querySelector('i');
+                        
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                            icon.classList.remove('rotate-180');
+                        } else {
+                            document.querySelectorAll('.accordion-content').forEach(c => { c.style.maxHeight = null; });
+                            document.querySelectorAll('.accordion-header i').forEach(i => { i.classList.remove('rotate-180'); });
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            icon.classList.add('rotate-180');
+                        }
+                    });
+                });
+            }
+
+            // --- Theme Switcher Logic ---
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    html.classList.add('dark');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                } else {
+                    html.classList.remove('dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            };
+            
+            applyTheme(savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light'));
+            
+            themeToggle.addEventListener('click', () => {
+                const newTheme = html.classList.contains('dark') ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // --- Language Switcher Logic ---
+            if (languageToggle) {
+                languageToggle.addEventListener('click', () => {
+                    // 平滑过渡效果
+                    languageToggle.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        languageToggle.style.transform = 'scale(1)';
+                        window.location.href = 'index.html';
+                    }, 150);
+                });
+            }
+
+            // --- Mobile Sidebar Toggle ---
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
+            }
+
+            // --- Sidebar Accordion ---
+            const navAccordion = document.querySelector('.nav-accordion');
+            if(navAccordion) {
+                const accordionButton = navAccordion.querySelector('button');
+                accordionButton.addEventListener('click', () => {
+                    navAccordion.classList.toggle('open');
+                });
+            }
+
+
+            // --- Active Link Highlighting on Scroll ---
+            const observer = new IntersectionObserver((entries) => {
+                let lastActiveFound = false;
+                entries.reverse().forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const link = document.querySelector(`.sidebar-link[href="#${id}"]`);
+                    if (entry.isIntersecting && !lastActiveFound) {
+                        sidebarLinks.forEach(l => l.classList.remove('active'));
+                        if(link) {
+                            link.classList.add('active');
+                            const parentAccordion = link.closest('.nav-accordion');
+                            if (parentAccordion && !parentAccordion.classList.contains('open')) {
+                                parentAccordion.classList.add('open');
+                            }
+                        }
+                        lastActiveFound = true;
+                    }
+                });
+            }, { root: null, rootMargin: '0px', threshold: 0.3 });
+
+            sections.forEach(section => observer.observe(section));
+            
+            // --- Content Fade-in Animation on Scroll ---
+            const animationObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => animationObserver.observe(section));
+            
+            // --- Close sidebar on link click (for mobile) ---
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768) sidebar.classList.add('-translate-x-full');
+                });
+            });
+            
+            // --- Initializations ---
+            const homeLink = document.querySelector('.sidebar-link[href="#home"]');
+            if (window.scrollY === 0 && homeLink) {
+                 sidebarLinks.forEach(l => l.classList.remove('active'));
+                 homeLink.classList.add('active');
+            }
+
+            setupPlayer();
+
+        });
+    </script>
+</body>
+</html>
+

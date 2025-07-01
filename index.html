@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIEC 职场素养中心</title>
+    
+    <!-- TailwindCSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for Icons via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+        .dark body {
+            background-color: #0f172a; /* bg-slate-900 改为稍浅一些 */
+        }
+        
+        /* Enhanced dark mode text colors for better readability */
+        .dark {
+            color: #f8fafc; /* slate-50 更亮的文字 */
+        }
+        
+        /* 主要文字颜色优化 */
+        .dark .text-slate-700 {
+            color: #f1f5f9 !important; /* slate-100 */
+        }
+        .dark .text-slate-600 {
+            color: #e2e8f0 !important; /* slate-200 */
+        }
+        .dark .text-slate-500 {
+            color: #cbd5e1 !important; /* slate-300 */
+        }
+        .dark .text-slate-400 {
+            color: #94a3b8 !important; /* slate-400 保持 */
+        }
+        .dark .text-slate-300 {
+            color: #e2e8f0 !important; /* slate-200 更亮 */
+        }
+        
+        /* 标题和重要文字 */
+        .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+            color: #ffffff !important;
+        }
+        
+        /* 卡片和容器背景优化 */
+        .dark .bg-white {
+            background-color: #1e293b !important; /* slate-800 */
+        }
+        .dark .bg-slate-100 {
+            background-color: #334155 !important; /* slate-700 */
+        }
+        .dark .bg-slate-50 {
+            background-color: #475569 !important; /* slate-600 */
+        }
+        
+        /* Smooth scrolling behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar for a modern look (optional) */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #94a3b8; /* slate-400 */
+            border-radius: 10px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #475569; /* slate-600 */
+        }
+
+        /* Active sidebar link style */
+        .sidebar-link.active {
+            background-color: #4f46e5; /* bg-indigo-600 */
+            color: white;
+        }
+        .dark .sidebar-link.active {
+            background-color: #4f46e5;
+        }
+        
+        /* Animation for content fade-in */
+        .content-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom audio player styling */
+        audio {
+            width: 100%;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        /* Custom card hover effect */
+        .hover-card {
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+        }
+        .dark .hover-card {
+            background-color: rgba(30, 41, 59, 0.8); /* slate-800 with higher opacity */
+            border-color: #475569; /* slate-600 更亮的边框 */
+        }
+        .hover-card:hover {
+            transform: translateY(-5px);
+            background-color: white;
+            border-color: #cbd5e1; /* slate-300 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .dark .hover-card:hover {
+            background-color: #1e293b; /* slate-800 更亮的悬停背景 */
+            border-color: #64748b; /* slate-500 更亮的悬停边框 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Styles for Linear design Home */
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.1), transparent);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .dark #home::before {
+             background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(124, 58, 237, 0.15), transparent);
+        }
+        .playbook-card {
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+        }
+        .dark .playbook-card {
+            border-color: #475569; /* slate-600 更亮的边框 */
+            background-color: rgba(30, 41, 59, 0.6); /* 稍微透明的背景 */
+        }
+        .playbook-card:hover {
+            background-color: white;
+            border-color: #cbd5e1; /* slate-300 */
+            transform: translateY(-4px);
+        }
+        .dark .playbook-card:hover {
+            background-color: #1e293b; /* slate-800 更亮的悬停背景 */
+            border-color: #64748b; /* slate-500 更亮的悬停边框 */
+        }
+
+        /* Accordion for FAQ and Sidebar*/
+        .accordion-item .accordion-header, .nav-accordion button {
+            cursor: pointer;
+        }
+        .accordion-item .accordion-content, .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out;
+        }
+        .nav-accordion.open .submenu {
+            max-height: 500px; /* A value larger than the content height */
+        }
+        .nav-accordion.open button .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+        
+        /* Flywheel diagram styles */
+        .flywheel { display: flex; justify-content: center; align-items: center; position: relative; width: 300px; height: 300px; margin: 2rem auto;}
+        .flywheel-center { width: 100px; height: 100px; background-color: #4f46e5; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; text-align:center; font-weight: bold; z-index: 10; font-size: 0.9rem; padding: 0.5rem;}
+        .flywheel-item { position: absolute; width: 100px; text-align: center; }
+        .flywheel-item-1 { top: 0; left: 50%; transform: translateX(-50%) translateY(-20%); }
+        .flywheel-item-2 { top: 50%; right: 0; transform: translateY(-50%) translateX(20%); }
+        .flywheel-item-3 { bottom: 0; left: 50%; transform: translateX(-50%) translateY(20%); }
+        .flywheel-item-4 { top: 50%; left: 0; transform: translateY(-50%) translateX(-20%); }
+        .flywheel svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; transform: rotate(-45deg); }
+        .flywheel svg circle { fill: none; stroke: #e2e8f0; stroke-width: 2; stroke-dasharray: 5; animation: spin 20s linear infinite; }
+        .dark .flywheel svg circle { stroke: #334155; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Playlist styles */
+        .playlist-item {
+            cursor: pointer;
+            border: 1px solid #e2e8f0; /* slate-200 */
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .dark .playlist-item {
+            border-color: #475569; /* slate-600 更亮的边框 */
+            background-color: rgba(30, 41, 59, 0.4); /* 稍微透明的背景 */
+        }
+        .playlist-item:hover {
+            background-color: #f1f5f9; /* slate-100 */
+            border-color: #cbd5e1; /* slate-300 */
+        }
+        .dark .playlist-item:hover {
+             background-color: #1e293b; /* slate-800 更亮的悬停背景 */
+            border-color: #64748b; /* slate-500 更亮的悬停边框 */
+        }
+        .playlist-item.active {
+            background-color: #eef2ff; /* indigo-50 */
+            border-color: #4f46e5; /* indigo-600 */
+        }
+        .dark .playlist-item.active {
+            background-color: rgba(79, 70, 229, 0.2); /* 更明显的激活状态 */
+            border-color: #6366f1; /* indigo-500 更亮 */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-100">
+
+    <div class="flex">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 bg-white dark:bg-slate-900 w-64 p-6 flex flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 border-r border-slate-200 dark:border-slate-700">
+            <div class="flex items-center space-x-3 mb-10">
+                <div class="bg-indigo-600 p-2 rounded-lg">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <h1 class="text-xl font-bold text-slate-900 dark:text-white">AIEC效率中心</h1>
+            </div>
+            
+            <nav class="flex-grow">
+                <ul class="space-y-2" id="sidebar-nav">
+                    <li><a href="#home" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200 active"><i class="fas fa-home w-6"></i><span>首页</span></a></li>
+                    
+                    <!-- Accordion Menu -->
+                    <li class="nav-accordion">
+                        <button class="w-full flex items-center justify-between p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200">
+                            <div class="flex items-center">
+                                <i class="fas fa-book-open w-6"></i>
+                                <span>团队职场素养</span>
+                            </div>
+                            <i class="fas fa-chevron-down transform transition-transform duration-200 text-xs"></i>
+                        </button>
+                        <ul class="submenu mt-2 space-y-1 pl-4">
+                            <li><a href="#strategy" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-map-signs w-6 text-slate-500 dark:text-slate-300"></i><span>战略进化蓝图</span></a></li>
+                            <li><a href="#newcomer" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-user-graduate w-6 text-slate-500 dark:text-slate-300"></i><span>新人：凡事有回应</span></a></li>
+                            <li><a href="#principles" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-cogs w-6 text-slate-500 dark:text-slate-300"></i><span>第一工作原则</span></a></li>
+                            <li><a href="#growth_pillars" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-monument w-6 text-slate-500 dark:text-slate-300"></i><span>成长四大支柱</span></a></li>
+                            <li><a href="#growth_model" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-sitemap w-6 text-slate-500 dark:text-slate-300"></i><span>团队成长模型</span></a></li>
+                            <li><a href="#product_dev" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-cubes w-6 text-slate-500 dark:text-slate-300"></i><span>产品学科化建设</span></a></li>
+                            <li><a href="#mindset" class="sidebar-link flex items-center p-3 rounded-lg text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-anchor w-6 text-slate-500 dark:text-slate-300"></i><span>组织心法</span></a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#aiec-fm" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-broadcast-tower w-6"></i><span>AIEC FM 📻</span></a></li>
+                </ul>
+            </nav>
+
+            <!-- Language Switcher -->
+            <div class="mt-auto space-y-3">
+                <button id="language-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 border border-indigo-200 dark:border-indigo-800">
+                    <i class="fas fa-language text-indigo-600 dark:text-indigo-400"></i>
+                    <span class="ml-3 text-sm font-medium text-indigo-700 dark:text-indigo-300">阿拉伯语版</span>
+                </button>
+                
+                <!-- Theme Switcher -->
+                 <button id="theme-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200">
+                    <i id="theme-icon" class="fas text-slate-500"></i>
+                    <span class="ml-3 text-sm font-medium text-slate-600 dark:text-slate-200">切换模式</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-0 md:ml-64 w-full p-6 sm:p-8 lg:p-12 transition-all duration-300 ease-in-out">
+             <!-- Mobile Header -->
+            <header class="md:hidden flex items-center justify-between mb-6">
+                 <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-600 p-2 rounded-lg">
+                        <i class="fas fa-brain text-white"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-slate-900 dark:text-white">AIEC效率中心</h1>
+                </div>
+                <button id="menu-toggle" class="p-2 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </header>
+
+            <!-- Section 0: Home Page -->
+            <section id="home" class="content-section min-h-screen pt-16 flex flex-col justify-center relative">
+                <div class="text-center z-10">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white leading-tight tracking-tight">
+                        AIEC <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-500">Playbook</span>
+                    </h1>
+                    <p class="mt-6 max-w-2xl mx-auto text-lg text-slate-600 dark:text-slate-300">
+                        一份动态更新的团队成长指南，旨在通过机制化、专业化的路径，帮助每位成员在变化中自如应对，在未知中建立信任。
+                    </p>
+                    <div class="mt-8">
+                        <a href="#newcomer" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full hover:bg-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-indigo-500/30">
+                            从“新人素养”开始 <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-20 z-10">
+                     <div class="text-center mb-8">
+                        <h2 class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 tracking-widest uppercase">核心原则</h2>
+                        <p class="mt-1 text-2xl font-bold text-slate-800 dark:text-slate-100">探索我们的工作与成长方式</p>
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-4">
+                        <a href="#strategy" class="playbook-card group block p-6 bg-white/50 dark:bg-slate-900/50 rounded-xl">
+                            <div class="flex items-center justify-center bg-indigo-100 dark:bg-indigo-900/50 rounded-lg w-12 h-12 mb-4">
+                               <i class="fas fa-map-signs text-xl text-indigo-600 dark:text-indigo-400"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100">战略进化蓝图</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">从“AI教练”到“战略引擎”的进化之路。</p>
+                        </a>
+                        <a href="#newcomer" class="playbook-card group block p-6 bg-white/50 dark:bg-slate-900/50 rounded-xl">
+                            <div class="flex items-center justify-center bg-sky-100 dark:bg-sky-900/50 rounded-lg w-12 h-12 mb-4">
+                               <i class="fas fa-user-graduate text-xl text-sky-600 dark:text-sky-400"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100">新人职场素养</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">掌握“凡事有回应”的四个层次。</p>
+                        </a>
+                         <a href="#growth_pillars" class="playbook-card group block p-6 bg-white/50 dark:bg-slate-900/50 rounded-xl">
+                            <div class="flex items-center justify-center bg-emerald-100 dark:bg-emerald-900/50 rounded-lg w-12 h-12 mb-4">
+                               <i class="fas fa-monument text-xl text-emerald-600 dark:text-emerald-400"></i>
+                            </div>
+                            <h4 class="font-bold text-lg mb-1 text-slate-800 dark:text-slate-100">成长四大支柱</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">构建四轮驱动的成长生态系统。</p>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Strategic Evolution Blueprint -->
+            <section id="strategy" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">AIEC战略进化蓝图</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">从“AI教练”到“战略引擎”，驱动51Talk在AI时代破浪前行。</p>
+                <audio controls src="audio/blueprint.wav"></audio>
+                
+                <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-indigo-500 flex items-center"><i class="fas fa-sitemap mr-3"></i>业务线一：组织AI化</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-4">深耕内部，苦练内功。从零散的技能培训，走向系统的组织AI化，实现三个层面的深度融合：</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><i class="fas fa-user-astronaut text-indigo-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">个体AI原生:</strong> AI成为员工的“第二大脑”与“高效外挂”。</span></li>
+                            <li class="flex items-start"><i class="fas fa-link text-indigo-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">协同AI增效:</strong> AI成为团队间无形的“超级链接器”。</span></li>
+                            <li class="flex items-start"><i class="fas fa-cogs text-indigo-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">流程AI变革:</strong> AI深度嵌入核心流程，实现颠覆式创新。</span></li>
+                        </ul>
+                    </div>
+                     <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-teal-500 flex items-center"><i class="fas fa-chart-line mr-3"></i>业务线二：商业化</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-4">赋能业务，勇闯江湖。将内部赋能作为通往外部商业化的练兵场，锤炼三大核心能力：</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><i class="fas fa-handshake text-teal-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">获客能力:</strong> 演练市场洞察、需求挖掘、方案营销。</span></li>
+                            <li class="flex items-start"><i class="fas fa-box-open text-teal-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">交付能力:</strong> 演练项目管理、产品交付、客户成功。</span></li>
+                            <li class="flex items-start"><i class="fas fa-sync-alt text-teal-400 mr-3 mt-1"></i><span><strong class="text-slate-800 dark:text-slate-100">服务能力:</strong> 演练售后服务、产品迭代、价值续约。</span></li>
+                        </ul>
+                    </div>
+                </div>
+                 <blockquote class="mt-8 border-l-4 border-violet-500 p-4 bg-violet-50 dark:bg-slate-800/50 rounded-r-lg">
+                    <p class="font-medium italic text-slate-700 dark:text-slate-200"><i class="fas fa-lightbulb mr-2"></i>核心增长飞轮：<strong class="text-violet-600 dark:text-violet-400">内功强，则江湖路远；江湖广，则内功更精。</strong>两条业务线互为因果，共同驱动团队成长。</p>
+                </blockquote>
+            </section>
+            
+            <!-- Section 2: Newcomer's Guide -->
+            <section id="newcomer" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🎒 新人职场素养：凡事有回应</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">“有回应”是专业、信任和效率的基石。它是一个从60分到100分的完整闭环，你走到哪一步了？</p>
+                 <audio controls src="audio/response.wav"></audio>
+                <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-indigo-500 text-2xl mb-3 font-bold">及格</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">基础响应</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>公式:</strong> 收到 + 预计完成时间。<br>“收到，下午3点前给您。”</p>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-sky-500 text-2xl mb-3 font-bold">优秀</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">主动澄清</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>心法:</strong> 用5W1H提问，避免做无用功。<br>“请问这次的简历主要用于什么决策？”</p>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-amber-500 text-2xl mb-3 font-bold">专业</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">过程同步</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>心法:</strong> 别让领导活在未知里。<br>“问了几家店都缺货，正在联系经销商。”</p>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <div class="text-emerald-500 text-2xl mb-3 font-bold">卓越</div><h3 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">结果闭环</h3><p class="text-sm text-slate-600 dark:text-slate-400"><strong>心法:</strong> 交付价值，而非完成任务。<br>“茅台买好了，另外发现XX渠道更优，已整理成文档。”</p>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-xl font-bold mb-4 text-center text-slate-800 dark:text-slate-100">新人常见困惑 (FAQ)</h3>
+                    <div class="space-y-4 max-w-3xl mx-auto" id="faq-accordion">
+                        <!-- FAQ items will be injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: First Working Principle -->
+            <section id="principles" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🔧 第一工作原则：机制优于意愿</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">"Good intention doesn't work, mechanic works." 我们工作的核心，是用可靠的“机制”替代不稳定的“意愿”。</p>
+                 <audio controls src="audio/mechanism.wav"></audio>
+                <div class="mt-12 hover-card p-8 rounded-xl">
+                    <h3 class="font-bold text-xl mb-4 text-center text-slate-800 dark:text-slate-100">为什么要坚持“机制驱动”？</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div><i class="fas fa-check-circle text-3xl text-green-500 mb-2"></i><h4 class="font-semibold text-slate-800 dark:text-slate-100">确保成果</h4><p class="text-sm text-slate-600 dark:text-slate-400">保证关键任务100%执行，而非“我以为我会做”。</p></div>
+                        <div><i class="fas fa-heart-broken text-3xl text-red-500 mb-2"></i><h4 class="font-semibold text-slate-800 dark:text-slate-100">根除内耗</h4><p class="text-sm text-slate-600 dark:text-slate-400">将团队从“要不要提醒他”这类情绪劳动中解放。</p></div>
+                        <div><i class="fas fa-expand-arrows-alt text-3xl text-blue-500 mb-2"></i><h4 class="font-semibold text-slate-800 dark:text-slate-100">实现规模化</h4><p class="text-sm text-slate-600 dark:text-slate-400">只有机制可复制，依赖个人意愿的模式无法做大。</p></div>
+                    </div>
+                    <div class="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
+                        <h4 class="font-semibold text-lg mb-4 text-center text-slate-800 dark:text-slate-100">将原则内化为肌肉记忆</h4>
+                         <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                            <div class="flex-1 text-center p-4 bg-slate-100 dark:bg-slate-800 rounded-lg"><strong class="text-indigo-500">1. 识别“意愿点”</strong><p class="text-sm text-slate-600 dark:text-slate-400">哪些环节还在依赖“我记得”？</p></div>
+                            <i class="fas fa-arrow-right text-slate-400 hidden md:block"></i>
+                             <i class="fas fa-arrow-down text-slate-400 md:hidden"></i>
+                            <div class="flex-1 text-center p-4 bg-slate-100 dark:bg-slate-800 rounded-lg"><strong class="text-indigo-500">2. 设计“机制”</strong><p class="text-sm text-slate-600 dark:text-slate-400">能否用SOP、模板、自动化替代？</p></div>
+                             <i class="fas fa-arrow-right text-slate-400 hidden md:block"></i>
+                             <i class="fas fa-arrow-down text-slate-400 md:hidden"></i>
+                            <div class="flex-1 text-center p-4 bg-slate-100 dark:bg-slate-800 rounded-lg"><strong class="text-indigo-500">3. 将机制“产品化”</strong><p class="text-sm text-slate-600 dark:text-slate-400">固化并分享，成为团队公共资产。</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 4: Four Pillars of Growth -->
+            <section id="growth_pillars" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🏛️ 成员加速成长的四大支柱</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">构建一个四轮驱动的成长生态系统，让每个人都能从四个维度汲取养分，实现指数级成长。</p>
+                 <audio controls src="audio/pillow.wav"></audio>
+                <div class="mt-12 grid md:grid-cols-2 gap-6">
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-indigo-500 flex items-center"><i class="fas fa-tasks w-8"></i>责任项目</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>是什么:</strong> 独立负责端到端的闭环项目。<br><strong>为何重要:</strong> 将知识转化为能力的唯一路径，培养主人翁意识。</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>主动承接，走出舒适区</li><li>闭环思考，关注全链路</li><li>定期复盘，沉淀经验</li></ul>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-sky-500 flex items-center"><i class="fas fa-compass w-8"></i>资深辅导</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>是什么:</strong> 资深成员提供的经验与思维模型指导。<br><strong>为何重要:</strong> 提供更高维度视角，帮你绕开“坑”，是宝贵资源。</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>带着问题和方案来</li><li>关注“为什么”，而非“标准答案”</li><li>主动预约，不要等待</li></ul>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-amber-500 flex items-center"><i class="fas fa-robot w-8"></i>AI赋能</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>是什么:</strong> 将AI深度融入日常工作与学习流程。<br><strong>为何重要:</strong> 这个时代的超级杠杆，7x24小时的顶级顾问。</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>AI First，打破惯性</li><li>成为AI的“指挥官”，学好提问</li><li>用AI撰稿、分析、 brainstorm</li></ul>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-3 text-emerald-500 flex items-center"><i class="fas fa-users w-8"></i>同伴学习</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-3"><strong>是什么:</strong> 平等的、双向的知识分享与难题共克。<br><strong>为何重要:</strong> 视角互补、安全区学习、教学相长。</p>
+                        <ul class="text-sm space-y-2 list-disc list-inside text-slate-500 dark:text-slate-400"><li>主动发起分享</li><li>建立学习小组 (Study Buddy)</li><li>交叉评审 (Peer Review)</li></ul>
+                    </div>
+                </div>
+                 <div class="flywheel text-slate-600 dark:text-slate-400">
+                    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="45"/></svg>
+                    <div class="flywheel-center">能力<br>跃迁</div>
+                    <div class="flywheel-item flywheel-item-1"><i class="fas fa-tasks text-indigo-500 text-2xl mb-1"></i><p class="text-xs">责任项目</p></div>
+                    <div class="flywheel-item flywheel-item-2"><i class="fas fa-robot text-amber-500 text-2xl mb-1"></i><p class="text-xs">AI赋能</p></div>
+                    <div class="flywheel-item flywheel-item-3"><i class="fas fa-users text-emerald-500 text-2xl mb-1"></i><p class="text-xs">同伴学习</p></div>
+                    <div class="flywheel-item flywheel-item-4"><i class="fas fa-compass text-sky-500 text-2xl mb-1"></i><p class="text-xs">资深辅导</p></div>
+                </div>
+            </section>
+            
+            <!-- Section 5: Team Growth Model -->
+            <section id="growth_model" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">📈 AIEC团队成长模型</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">我们的核心契约是“价值交换”，我们坚定的战略定位是“成长型”环境。</p>
+                 <audio controls src="audio/growth.wav"></audio>
+                <div class="mt-12 grid lg:grid-cols-5 gap-8 items-center">
+                    <div class="lg:col-span-2 space-y-6">
+                        <h3 class="font-bold text-xl text-indigo-500">核心契约：公平的价值交换</h3>
+                        <div class="hover-card p-6 rounded-xl">
+                            <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">1. 投入度自决</h4>
+                            <p class="text-slate-600 dark:text-slate-300">你是自己时间和精力的主人。团队是装备精良的<strong class="text-green-500">“健身房”</strong>，而不是设定好速度的<strong class="text-red-500">“流水线”</strong>。我们不设强制加班，杜绝无效内卷。</p>
+                        </div>
+                        <div class="hover-card p-6 rounded-xl">
+                            <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100">2. 因果清晰对等</h4>
+                            <p class="text-slate-600 dark:text-slate-300">投入与回报成正比。你解决问题的难度、承担责任的大小，将直接决定你获得的<strong class="text-indigo-400">成长速度、核心机会与价值认可</strong>。</p>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 p-6 hover-card rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-center text-slate-800 dark:text-slate-100">成长环境四象限</h3>
+                        <div class="relative grid grid-cols-2 grid-rows-2 gap-1 bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg">
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full text-center text-sm text-slate-500 dark:text-slate-400"><span>拉得狠 <i class="fas fa-long-arrow-alt-right"></i></span></div>
+                            <div class="absolute top-1/2 left-0 -translate-x-full -translate-y-1/2 text-center text-sm text-slate-500 dark:text-slate-400" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(50%) translateY(50%);"><span class="mx-auto">成长型 <i class="fas fa-long-arrow-alt-up"></i></span></div>
+                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="w-px h-full bg-slate-300 dark:bg-slate-700"></div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="h-px w-full bg-slate-300 dark:bg-slate-700"></div>
+                            </div>
+                            <div class="p-4 text-center"><p class="font-semibold text-green-500">高潜孵化器</p><p class="text-xs text-slate-600 dark:text-slate-400">我们默认的环境</p></div>
+                            <div class="p-4 text-center"><p class="font-semibold text-blue-500">精英训练营</p><p class="text-xs text-slate-600 dark:text-slate-400">为你准备的快车道</p></div>
+                            <div class="p-4 text-center"><p class="font-semibold text-slate-500">养老院</p></div>
+                            <div class="p-4 text-center"><p class="font-semibold text-red-500">血汗工厂</p></div>
+                        </div>
+                        <p class="text-sm mt-4 text-center text-slate-600 dark:text-slate-400">我们的战略选择是<strong class="text-green-500">“成长型”</strong>象限，默认是<strong class="text-green-500">“高潜孵化器”</strong>，并提供通往<strong class="text-blue-500">“精英训练营”</strong>的钥匙。</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 6: Product Development Paradigm -->
+            <section id="product_dev" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">🔬 产品学科化建设新范式</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">放下“存量经验”，拥抱“AI增量”。核心原则：<strong class="text-indigo-500">难的事情，给会AI的人做</strong>。</p>
+                 <audio controls src="audio/subject.wav"></audio>
+                <div class="mt-12 hover-card p-8 rounded-xl">
+                    <h3 class="font-bold text-xl mb-4 text-center text-slate-800 dark:text-slate-100">三轴拆解法：系统化构建产品学科体系</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                         <div class="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-cogs text-4xl text-sky-500 mb-3"></i><h4 class="font-semibold text-lg text-slate-800 dark:text-slate-100">技能轴 (Skill)</h4><p class="text-sm text-slate-600 dark:text-slate-400">专业能力的肌肉和骨骼。如用户研究、产品设计、提示词工程。</p>
+                        </div>
+                        <div class="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-tools text-4xl text-amber-500 mb-3"></i><h4 class="font-semibold text-lg text-slate-800 dark:text-slate-100">工具轴 (Tool)</h4><p class="text-sm text-slate-600 dark:text-slate-400">实现技能的武器库，尤其是AI工具。</p>
+                        </div>
+                        <div class="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+                            <i class="fas fa-bullseye text-4xl text-emerald-500 mb-3"></i><h4 class="font-semibold text-lg text-slate-800 dark:text-slate-100">场景轴 (Scenario)</h4><p class="text-sm text-slate-600 dark:text-slate-400">价值创造的最终战场。如制作课件、设计落地页。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 grid md:grid-cols-2 gap-8">
+                     <div class="hover-card p-6 rounded-xl">
+                        <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100"><i class="fas fa-user-ninja mr-2"></i>对每一位员工：</h4>
+                        <ul class="text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside"><li>拥抱AI，成为“会AI的人”，这是必修课。</li><li>从“执行者”到“拥有者”，敢于承担“难”的事。</li><li>学习结构化思考与输出，将复杂问题简单化。</li></ul>
+                     </div>
+                     <div class="hover-card p-6 rounded-xl">
+                        <h4 class="font-semibold text-lg mb-2 text-slate-800 dark:text-slate-100"><i class="fas fa-crown mr-2"></i>对每一位管理者：</h4>
+                         <ul class="text-slate-600 dark:text-slate-300 space-y-2 list-disc list-inside"><li>学会“优雅地甩锅”，信任并授权给具备AI能力的下属。</li><li>从“管事”到“理人”与“赋能”，激发团队潜能。</li><li>成为“整合者”，连接点、线、面，汇聚合力。</li></ul>
+                     </div>
+                </div>
+            </section>
+            
+            <!-- Section 7: Organizational Mindset -->
+            <section id="mindset" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">💖 组织心法：在变化中保持稳定</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">AI效率中心正航行在未知的新大陆。拥抱变化的前提是识别变化，穿越风浪的底气是坚守不变。</p>
+                 <audio controls src="audio/change.wav"></audio>
+                <div class="mt-12 grid lg:grid-cols-2 gap-8">
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-orange-500"><i class="fas fa-exchange-alt mr-2"></i>未来一定会变的三件事 (变量)</h3>
+                        <div class="space-y-4 text-slate-600 dark:text-slate-300">
+                           <p><i class="fas fa-users-cog w-6 text-orange-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">团队与工作方式:</strong> 我们的分工、协作流程会持续迭代，请保持开放灵活。</p>
+                           <p><i class="fas fa-lightbulb w-6 text-orange-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">认知与决策路径:</strong> 我们在“无人区”探索，战略和决策会敏捷调整，快速试错。</p>
+                           <p><i class="fas fa-globe-americas w-6 text-orange-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">外部环境与战略节奏:</strong> 市场、公司战略都可能带来冲击，这是商业常态。</p>
+                        </div>
+                    </div>
+                    <div class="hover-card p-6 rounded-xl">
+                        <h3 class="font-bold text-xl mb-4 text-green-500"><i class="fas fa-anchor mr-2"></i>坚守不变的两大原则 (常量)</h3>
+                        <div class="space-y-4 text-slate-600 dark:text-slate-300">
+                           <p><i class="fas fa-wind w-6 text-green-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">不变的团队心态:</strong> 主动拥抱不确定性，将“为什么又变了？”的抱怨，转变为“有什么新机会？”的思考。</p>
+                           <p><i class="fas fa-bullhorn w-6 text-green-400 mr-2"></i><strong class="text-slate-800 dark:text-slate-100">不变的领导承诺:</strong> 对“WHY”的极致透明，拒绝“工具人”文化，激发主人翁意识，建立深度信任。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: AIEC FM -->
+            <section id="aiec-fm" class="content-section min-h-screen pt-16">
+                <h2 class="text-3xl sm:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">AIEC FM 📻</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-300 mb-8">精选团队核心心法，随时随地收听，内化成长之道。</p>
+                
+                <div id="main-player-card" class="bg-white dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-800 mb-8 sticky top-4 z-20">
+                     <div class="flex items-center mb-4">
+                        <div id="player-icon-container" class="bg-indigo-100 dark:bg-indigo-900/50 rounded-lg w-16 h-16 flex items-center justify-center mr-4">
+                            <i id="player-icon" class="fas fa-headphones-alt text-3xl text-indigo-600 dark:text-indigo-400"></i>
+                        </div>
+                        <div>
+                            <h3 id="player-title" class="font-bold text-xl text-slate-800 dark:text-slate-100">请选择一集收听</h3>
+                            <p id="player-description" class="text-sm text-slate-600 dark:text-slate-400">点击下方列表开始播放</p>
+                        </div>
+                    </div>
+                    <audio id="main-audio-player" controls src="audio/blueprint.wav"></audio>
+                </div>
+
+                <div id="playlist" class="space-y-4">
+                    <!-- Playlist items will be injected by JS -->
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Elements ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const languageToggle = document.getElementById('language-toggle');
+            const html = document.documentElement;
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+            const faqContainer = document.getElementById('faq-accordion');
+            
+            // --- Player Elements ---
+            const mainAudioPlayer = document.getElementById('main-audio-player');
+            const playerTitle = document.getElementById('player-title');
+            const playerDescription = document.getElementById('player-description');
+            const playerIcon = document.getElementById('player-icon');
+            const playlistContainer = document.getElementById('playlist');
+
+            // --- Data ---
+            const faqs = [
+                { q: "每天汇报会不会显得我能力不行，需要人盯着？", a: "恰恰相反！主动汇报显示你有责任心和全局观。能力强的人更懂得让工作透明化。记住：透明≠无能，而是专业。" },
+                { q: "我发了汇报，领导从来不回复，是不是我做错了什么？", a: "不回复往往意味着认可！领导不回复通常有三种情况：①满意你的汇报；②太忙没时间回复；③已经养成习惯。继续保持就好，安静的认可是最好的认可。" },
+                { q: "我问太多问题，会不会显得我思路不清楚？", a: "问得聪明比不问强！好的问题显示你在思考。关键是问有价值的问题(比如二选一)，而不是“我该怎么做?”。" },
+                { q: "领导说“你看着办”，我还需要澄清吗？", a: "需要！“你看着办”往往是测试题。可以回复：“好的，我的理解是[你的方案]，如果有偏差请告诉我。”这样既显示思考力，又规避风险。" },
+                { q: "遇到困难时汇报，会不会暴露我能力不足？", a: "早暴露问题是能力强的体现！隐瞒问题到最后爆雷，才是能力不足。正确的做法是：发现问题 → 分析原因 → 提出方案 → 寻求支持。" },
+                { q: "跨部门合作时，对方不回应我的消息怎么办？", a: "①确认对方收到消息 ②抄送相关领导 ③设定合理期限 ④主动电话联系。记住：你的专业不能因为别人的不专业而降低标准。" },
+            ];
+
+            const playlistData = [
+                { id: "strategy", title: "战略进化蓝图", description: "从“AI教练”到“战略引擎”", icon: "fa-map-signs", audioSrc: "audio/blueprint.wav" },
+                { id: "newcomer", title: "新人职场素养", description: "掌握“凡事有回应”的四个层次", icon: "fa-user-graduate", audioSrc: "audio/response.wav" },
+                { id: "principles", title: "第一工作原则", description: "机制优于意愿", icon: "fa-cogs", audioSrc: "audio/mechanism.wav" },
+                { id: "growth_pillars", title: "成长四大支柱", description: "构建四轮驱动的成长生态系统", icon: "fa-monument", audioSrc: "audio/pillow.wav" },
+                { id: "growth_model", title: "团队成长模型", description: "关于价值交换与成长环境", icon: "fa-sitemap", audioSrc: "audio/growth.wav" },
+                { id: "product_dev", title: "产品学科化建设", description: "放下存量经验，拥抱AI增量", icon: "fa-cubes", audioSrc: "audio/subject.wav" },
+                { id: "mindset", title: "组织心法", description: "在变化中保持稳定", icon: "fa-anchor", audioSrc: "audio/change.wav" }
+            ];
+            
+            // --- Initialize Player & Playlist ---
+            function setupPlayer() {
+                if (!playlistContainer) return;
+
+                playlistContainer.innerHTML = playlistData.map(track => `
+                    <div class="playlist-item p-4 rounded-lg flex items-center" data-src="${track.audioSrc}" data-title="${track.title}" data-description="${track.description}" data-icon="${track.icon}">
+                        <div class="bg-slate-100 dark:bg-slate-800 rounded-md w-12 h-12 flex items-center justify-center mr-4">
+                            <i class="fas ${track.icon} text-slate-500 text-xl"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-100">${track.title}</h4>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">${track.description}</p>
+                        </div>
+                        <div class="play-indicator ml-4">
+                            <i class="fas fa-play-circle text-2xl text-slate-400 dark:text-slate-600"></i>
+                        </div>
+                    </div>
+                `).join('');
+
+                const playlistItems = document.querySelectorAll('.playlist-item');
+                playlistItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const src = this.dataset.src;
+                        const title = this.dataset.title;
+                        const description = this.dataset.description;
+                        const iconClass = this.dataset.icon;
+
+                        // Update main player
+                        mainAudioPlayer.src = src;
+                        playerTitle.textContent = title;
+                        playerDescription.textContent = description;
+                        playerIcon.className = `fas ${iconClass} text-3xl text-indigo-600 dark:text-indigo-400`;
+
+                        // Update UI states
+                        playlistItems.forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Update play icons
+                        document.querySelectorAll('.play-indicator i').forEach(i => {
+                            i.className = 'fas fa-play-circle text-2xl text-slate-400 dark:text-slate-600';
+                        });
+                        this.querySelector('.play-indicator i').className = 'fas fa-volume-up text-2xl text-indigo-500';
+                        
+                        mainAudioPlayer.load();
+                        mainAudioPlayer.play();
+                    });
+                });
+            }
+
+
+            // --- Inject FAQs into Accordion ---
+            if(faqContainer) {
+                faqContainer.innerHTML = faqs.map((faq, index) => `
+                    <div class="accordion-item bg-white dark:bg-slate-800/80 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <div class="accordion-header flex justify-between items-center p-4">
+                            <h4 class="font-semibold text-slate-800 dark:text-slate-200">${faq.q}</h4>
+                            <i class="fas fa-chevron-down text-slate-500 transition-transform"></i>
+                        </div>
+                        <div class="accordion-content">
+                            <p class="p-4 pt-0 text-slate-700 dark:text-slate-300">${faq.a}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.querySelectorAll('.accordion-header').forEach(header => {
+                    header.addEventListener('click', () => {
+                        const content = header.nextElementSibling;
+                        const icon = header.querySelector('i');
+                        
+                        if (content.style.maxHeight) {
+                            content.style.maxHeight = null;
+                            icon.classList.remove('rotate-180');
+                        } else {
+                            document.querySelectorAll('.accordion-content').forEach(c => { c.style.maxHeight = null; });
+                            document.querySelectorAll('.accordion-header i').forEach(i => { i.classList.remove('rotate-180'); });
+                            content.style.maxHeight = content.scrollHeight + "px";
+                            icon.classList.add('rotate-180');
+                        }
+                    });
+                });
+            }
+
+            // --- Theme Switcher Logic ---
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    html.classList.add('dark');
+                    themeIcon.classList.remove('fa-sun');
+                    themeIcon.classList.add('fa-moon');
+                } else {
+                    html.classList.remove('dark');
+                    themeIcon.classList.remove('fa-moon');
+                    themeIcon.classList.add('fa-sun');
+                }
+            };
+            
+            applyTheme(savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light'));
+            
+            themeToggle.addEventListener('click', () => {
+                const newTheme = html.classList.contains('dark') ? 'light' : 'dark';
+                applyTheme(newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+
+            // --- Language Switcher Logic ---
+            if (languageToggle) {
+                languageToggle.addEventListener('click', () => {
+                    // 平滑过渡效果
+                    languageToggle.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        languageToggle.style.transform = 'scale(1)';
+                        window.location.href = 'index-ar.html';
+                    }, 150);
+                });
+            }
+
+            // --- Mobile Sidebar Toggle ---
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => sidebar.classList.toggle('-translate-x-full'));
+            }
+
+            // --- Sidebar Accordion ---
+            const navAccordion = document.querySelector('.nav-accordion');
+            if(navAccordion) {
+                const accordionButton = navAccordion.querySelector('button');
+                accordionButton.addEventListener('click', () => {
+                    navAccordion.classList.toggle('open');
+                });
+            }
+
+
+            // --- Active Link Highlighting on Scroll ---
+            const observer = new IntersectionObserver((entries) => {
+                let lastActiveFound = false;
+                entries.reverse().forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const link = document.querySelector(`.sidebar-link[href="#${id}"]`);
+                    if (entry.isIntersecting && !lastActiveFound) {
+                        sidebarLinks.forEach(l => l.classList.remove('active'));
+                        if(link) {
+                            link.classList.add('active');
+                            const parentAccordion = link.closest('.nav-accordion');
+                            if (parentAccordion && !parentAccordion.classList.contains('open')) {
+                                parentAccordion.classList.add('open');
+                            }
+                        }
+                        lastActiveFound = true;
+                    }
+                });
+            }, { root: null, rootMargin: '0px', threshold: 0.3 });
+
+            sections.forEach(section => observer.observe(section));
+            
+            // --- Content Fade-in Animation on Scroll ---
+            const animationObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            sections.forEach(section => animationObserver.observe(section));
+            
+            // --- Close sidebar on link click (for mobile) ---
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth < 768) sidebar.classList.add('-translate-x-full');
+                });
+            });
+            
+            // --- Initializations ---
+            const homeLink = document.querySelector('.sidebar-link[href="#home"]');
+            if (window.scrollY === 0 && homeLink) {
+                 sidebarLinks.forEach(l => l.classList.remove('active'));
+                 homeLink.classList.add('active');
+            }
+
+            setupPlayer();
+
+        });
+    </script>
+</body>
+</html>
+
