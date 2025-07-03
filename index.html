@@ -262,20 +262,49 @@
                     </li>
 
                     <li><a href="#aiec-fm" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-broadcast-tower w-6"></i><span>AIEC FM 📻</span></a></li>
+                    <li><a href="quiz.html" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-brain w-6"></i><span>AI 智能测验</span></a></li>
                 </ul>
             </nav>
 
-            <!-- Language Switcher -->
+            <!-- 用户信息和学习进度 -->
             <div class="mt-auto space-y-3">
+                <!-- 用户信息 -->
+                <div class="p-3 bg-slate-100 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-user-circle text-indigo-600 text-xl mr-2"></i>
+                        <div>
+                            <p class="text-sm font-medium text-slate-700 dark:text-slate-200" id="user-name">加载中...</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400" id="user-role">角色</p>
+                        </div>
+                    </div>
+                    <!-- 学习进度 -->
+                    <div class="mb-2">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-slate-600 dark:text-slate-400">学习进度</span>
+                            <span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium" id="progress-text">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                            <div id="progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Language Switcher -->
                 <button id="language-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors duration-200 border border-indigo-200 dark:border-indigo-800">
                     <i class="fas fa-language text-indigo-600 dark:text-indigo-400"></i>
                     <span class="ml-3 text-sm font-medium text-indigo-700 dark:text-indigo-300">阿拉伯语版</span>
                 </button>
                 
                 <!-- Theme Switcher -->
-                 <button id="theme-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200">
+                <button id="theme-toggle" class="w-full flex items-center justify-center p-3 rounded-lg bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors duration-200">
                     <i id="theme-icon" class="fas text-slate-500"></i>
                     <span class="ml-3 text-sm font-medium text-slate-600 dark:text-slate-200">切换模式</span>
+                </button>
+                
+                <!-- 退出登录 -->
+                <button id="logout-btn" class="w-full flex items-center justify-center p-3 rounded-lg bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors duration-200 border border-red-200 dark:border-red-800">
+                    <i class="fas fa-sign-out-alt text-red-600 dark:text-red-400"></i>
+                    <span class="ml-3 text-sm font-medium text-red-700 dark:text-red-300">退出登录</span>
                 </button>
             </div>
         </aside>
@@ -585,6 +614,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- 用户验证 ---
+            const userRole = localStorage.getItem('userRole');
+            const username = localStorage.getItem('username');
+            
+            if (!userRole || !username) {
+                alert('请先登录！');
+                window.location.href = 'login.html';
+                return;
+            }
+            
             // --- Elements ---
             const themeToggle = document.getElementById('theme-toggle');
             const themeIcon = document.getElementById('theme-icon');
@@ -797,6 +836,139 @@
                 });
             });
             
+            // --- 学习进度管理 ---
+            const learningProgress = {
+                sections: ['home', 'strategy', 'newcomer', 'principles', 'growth_pillars', 'growth_model', 'product_dev', 'mindset'],
+                
+                // 获取用户进度
+                getUserProgress: function() {
+                    const saved = localStorage.getItem(`progress_${username}`);
+                    return saved ? JSON.parse(saved) : {};
+                },
+                
+                // 保存用户进度
+                saveProgress: function(sectionId, completed = false) {
+                    const progress = this.getUserProgress();
+                    if (!progress[sectionId]) {
+                        progress[sectionId] = {
+                            visited: false,
+                            completed: false,
+                            visitTime: null,
+                            completionTime: null
+                        };
+                    }
+                    
+                    progress[sectionId].visited = true;
+                    progress[sectionId].visitTime = new Date().toISOString();
+                    
+                    if (completed) {
+                        progress[sectionId].completed = true;
+                        progress[sectionId].completionTime = new Date().toISOString();
+                    }
+                    
+                    localStorage.setItem(`progress_${username}`, JSON.stringify(progress));
+                    this.updateProgressBar();
+                },
+                
+                // 更新进度条
+                updateProgressBar: function() {
+                    const progress = this.getUserProgress();
+                    const totalSections = this.sections.length;
+                    const completedSections = Object.values(progress).filter(p => p.completed).length;
+                    const progressPercentage = Math.round((completedSections / totalSections) * 100);
+                    
+                    document.getElementById('progress-bar').style.width = progressPercentage + '%';
+                    document.getElementById('progress-text').textContent = progressPercentage + '%';
+                    
+                    // 更新侧边栏章节状态
+                    this.updateSidebarProgress(progress);
+                },
+                
+                // 更新侧边栏进度指示
+                updateSidebarProgress: function(progress) {
+                    this.sections.forEach(sectionId => {
+                        const link = document.querySelector(`a[href="#${sectionId}"]`);
+                        if (link && progress[sectionId]) {
+                            // 移除现有的进度图标
+                            const existingIcon = link.querySelector('.progress-icon');
+                            if (existingIcon) existingIcon.remove();
+                            
+                            // 添加进度图标
+                            const icon = document.createElement('i');
+                            icon.className = 'progress-icon fas ml-auto text-xs';
+                            
+                            if (progress[sectionId].completed) {
+                                icon.classList.add('fa-check-circle', 'text-green-500');
+                            } else if (progress[sectionId].visited) {
+                                icon.classList.add('fa-clock', 'text-yellow-500');
+                            }
+                            
+                            link.appendChild(icon);
+                        }
+                    });
+                }
+            };
+            
+            // --- 用户信息显示 ---
+            document.getElementById('user-name').textContent = username;
+            document.getElementById('user-role').textContent = userRole === 'admin' ? '管理员' : '新员工';
+            
+            // --- 退出登录 ---
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('loginTime');
+                    window.location.href = 'login.html';
+                }
+            });
+            
+            // --- 章节访问跟踪 ---
+            const trackSectionVisit = (sectionId) => {
+                learningProgress.saveProgress(sectionId, false);
+                
+                // 为每个章节添加完成按钮
+                const section = document.getElementById(sectionId);
+                if (section && !section.querySelector('.complete-btn')) {
+                    const completeBtn = document.createElement('button');
+                    completeBtn.className = 'complete-btn mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200';
+                    completeBtn.innerHTML = '<i class="fas fa-check mr-2"></i>标记为已完成';
+                    completeBtn.addEventListener('click', () => {
+                        learningProgress.saveProgress(sectionId, true);
+                        completeBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>已完成';
+                        completeBtn.disabled = true;
+                        completeBtn.className = 'complete-btn mt-6 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed';
+                    });
+                    
+                    section.appendChild(completeBtn);
+                }
+            };
+            
+            // --- 音频播放跟踪 ---
+            const trackAudioProgress = () => {
+                const audioElements = document.querySelectorAll('audio');
+                audioElements.forEach(audio => {
+                    audio.addEventListener('ended', () => {
+                        // 找到音频所在的章节
+                        const section = audio.closest('.content-section');
+                        if (section) {
+                            const sectionId = section.id;
+                            learningProgress.saveProgress(sectionId, false);
+                            
+                            // 显示音频完成提示
+                            const toast = document.createElement('div');
+                            toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                            toast.innerHTML = '<i class="fas fa-check mr-2"></i>音频播放完成！';
+                            document.body.appendChild(toast);
+                            
+                            setTimeout(() => {
+                                toast.remove();
+                            }, 3000);
+                        }
+                    });
+                });
+            };
+
             // --- Initializations ---
             const homeLink = document.querySelector('.sidebar-link[href="#home"]');
             if (window.scrollY === 0 && homeLink) {
@@ -805,6 +977,30 @@
             }
 
             setupPlayer();
+            learningProgress.updateProgressBar();
+            trackAudioProgress();
+            
+            // 跟踪章节访问
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5
+            };
+            
+            const sectionObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const sectionId = entry.target.id;
+                        if (learningProgress.sections.includes(sectionId)) {
+                            trackSectionVisit(sectionId);
+                        }
+                    }
+                });
+            }, observerOptions);
+            
+            sections.forEach(section => {
+                sectionObserver.observe(section);
+            });
 
         });
     </script>

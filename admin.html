@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIEC 管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .dark body {
+            background-color: #0f172a;
+        }
+        .card {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+        .dark .card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-100">
+    <div class="min-h-screen">
+        <!-- 顶部导航 -->
+        <nav class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="bg-indigo-600 p-2 rounded-lg mr-3">
+                            <i class="fas fa-brain text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-slate-900 dark:text-white">AIEC 管理后台</h1>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">培训数据统计与管理</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-sm text-slate-600 dark:text-slate-400">
+                            <i class="fas fa-user-shield mr-1"></i>
+                            <span id="admin-name">管理员</span>
+                        </span>
+                        <button id="theme-toggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+                            <i id="theme-icon" class="fas fa-sun text-slate-600 dark:text-slate-300"></i>
+                        </button>
+                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
+                            <i class="fas fa-sign-out-alt mr-2"></i>退出
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="card p-6">
+                    <div class="flex items-center">
+                        <div class="bg-blue-100 dark:bg-blue-900/20 p-3 rounded-lg">
+                            <i class="fas fa-users text-blue-600 dark:text-blue-400 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-slate-600 dark:text-slate-400">总用户数</p>
+                            <p id="total-users" class="text-2xl font-bold text-slate-900 dark:text-slate-100">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center">
+                        <div class="bg-green-100 dark:bg-green-900/20 p-3 rounded-lg">
+                            <i class="fas fa-graduation-cap text-green-600 dark:text-green-400 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-slate-600 dark:text-slate-400">完成学习用户</p>
+                            <p id="completed-users" class="text-2xl font-bold text-slate-900 dark:text-slate-100">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center">
+                        <div class="bg-yellow-100 dark:bg-yellow-900/20 p-3 rounded-lg">
+                            <i class="fas fa-clock text-yellow-600 dark:text-yellow-400 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-slate-600 dark:text-slate-400">平均学习时长</p>
+                            <p id="avg-study-time" class="text-2xl font-bold text-slate-900 dark:text-slate-100">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6">
+                    <div class="flex items-center">
+                        <div class="bg-purple-100 dark:bg-purple-900/20 p-3 rounded-lg">
+                            <i class="fas fa-chart-line text-purple-600 dark:text-purple-400 text-2xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-slate-600 dark:text-slate-400">平均测验分数</p>
+                            <p id="avg-quiz-score" class="text-2xl font-bold text-slate-900 dark:text-slate-100">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 主要内容区域 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- 用户列表 -->
+                <div class="lg:col-span-2">
+                    <div class="card">
+                        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                            <div class="flex items-center justify-between">
+                                <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                    <i class="fas fa-users mr-2"></i>学员详情
+                                </h2>
+                                <button id="refresh-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                                    <i class="fas fa-sync-alt mr-2"></i>刷新数据
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-slate-50 dark:bg-slate-800">
+                                        <tr>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">用户名</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">学习进度</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">测验次数</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">最高分</th>
+                                            <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">最后活动</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user-table" class="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700">
+                                        <!-- 用户数据将通过JavaScript填充 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右侧统计图表 -->
+                <div class="space-y-6">
+                    <!-- 学习进度分布 -->
+                    <div class="card">
+                        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                <i class="fas fa-chart-pie mr-2"></i>学习进度分布
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <canvas id="progress-chart" width="200" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 章节完成度 -->
+                    <div class="card">
+                        <div class="p-6 border-b border-slate-200 dark:border-slate-700">
+                            <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                                <i class="fas fa-chart-bar mr-2"></i>章节完成度
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <div id="chapter-completion" class="space-y-3">
+                                <!-- 章节完成度将通过JavaScript填充 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户验证
+        const userRole = localStorage.getItem('userRole');
+        const username = localStorage.getItem('username');
+        
+        if (!userRole || userRole !== 'admin') {
+            alert('权限不足！请以管理员身份登录。');
+            window.location.href = 'login.html';
+        }
+
+        // 章节信息
+        const chapters = [
+            { id: 'home', title: '首页' },
+            { id: 'strategy', title: '战略进化蓝图' },
+            { id: 'newcomer', title: '新人职场素养' },
+            { id: 'principles', title: '第一工作原则' },
+            { id: 'growth_pillars', title: '成长四大支柱' },
+            { id: 'growth_model', title: '团队成长模型' },
+            { id: 'product_dev', title: '产品学科化建设' },
+            { id: 'mindset', title: '组织心法' }
+        ];
+
+        // 管理后台数据管理
+        const adminData = {
+            // 获取所有用户数据
+            getAllUserData: function() {
+                const users = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('progress_')) {
+                        const username = key.replace('progress_', '');
+                        if (username !== 'admin') {
+                            const progressData = JSON.parse(localStorage.getItem(key));
+                            const quizData = JSON.parse(localStorage.getItem(`quiz_results_${username}`) || '{}');
+                            const loginTime = localStorage.getItem(`loginTime_${username}`) || localStorage.getItem('loginTime');
+                            
+                            users.push({
+                                username: username,
+                                progress: progressData,
+                                quizResults: quizData,
+                                lastActivity: loginTime
+                            });
+                        }
+                    }
+                }
+                return users;
+            },
+
+            // 计算用户学习进度百分比
+            getUserProgressPercentage: function(progressData) {
+                const totalSections = chapters.length;
+                const completedSections = Object.values(progressData).filter(p => p.completed).length;
+                return Math.round((completedSections / totalSections) * 100);
+            },
+
+            // 获取用户最高测验分数
+            getUserMaxScore: function(quizResults) {
+                const scores = Object.values(quizResults).map(result => result.percentage);
+                return scores.length > 0 ? Math.max(...scores) : 0;
+            },
+
+            // 获取测验次数
+            getUserQuizCount: function(quizResults) {
+                return Object.keys(quizResults).length;
+            }
+        };
+
+        // 初始化管理界面
+        function initAdmin() {
+            document.getElementById('admin-name').textContent = username;
+            setupEventListeners();
+            loadDashboardData();
+            setupTheme();
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 退出登录
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('确定要退出登录吗？')) {
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('loginTime');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // 刷新数据
+            document.getElementById('refresh-btn').addEventListener('click', loadDashboardData);
+
+            // 主题切换
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+        }
+
+        // 加载仪表板数据
+        function loadDashboardData() {
+            const users = adminData.getAllUserData();
+            
+            // 更新统计卡片
+            updateStatistics(users);
+            
+            // 更新用户表格
+            updateUserTable(users);
+            
+            // 更新图表
+            updateCharts(users);
+        }
+
+        // 更新统计信息
+        function updateStatistics(users) {
+            const totalUsers = users.length;
+            const completedUsers = users.filter(user => 
+                adminData.getUserProgressPercentage(user.progress) === 100
+            ).length;
+            
+            const avgStudyTime = users.reduce((sum, user) => {
+                const progressData = user.progress;
+                const completedSections = Object.values(progressData).filter(p => p.completed).length;
+                return sum + completedSections;
+            }, 0) / (totalUsers || 1);
+
+            const avgQuizScore = users.reduce((sum, user) => {
+                return sum + adminData.getUserMaxScore(user.quizResults);
+            }, 0) / (totalUsers || 1);
+
+            document.getElementById('total-users').textContent = totalUsers;
+            document.getElementById('completed-users').textContent = completedUsers;
+            document.getElementById('avg-study-time').textContent = Math.round(avgStudyTime) + ' 章节';
+            document.getElementById('avg-quiz-score').textContent = Math.round(avgQuizScore) + '%';
+        }
+
+        // 更新用户表格
+        function updateUserTable(users) {
+            const tableBody = document.getElementById('user-table');
+            
+            if (users.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-slate-500 dark:text-slate-400">
+                            <i class="fas fa-user-slash text-4xl mb-2"></i>
+                            <p>暂无学员数据</p>
+                            <p class="text-sm">学员登录学习后数据将显示在这里</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = users.map(user => {
+                const progressPercentage = adminData.getUserProgressPercentage(user.progress);
+                const maxScore = adminData.getUserMaxScore(user.quizResults);
+                const quizCount = adminData.getUserQuizCount(user.quizResults);
+                const lastActivity = user.lastActivity ? new Date(user.lastActivity).toLocaleDateString() : '未知';
+
+                return `
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800">
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-circle text-2xl text-slate-400 mr-3"></i>
+                                <span class="font-medium text-slate-900 dark:text-slate-100">${user.username}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="w-16 bg-slate-200 dark:bg-slate-700 rounded-full h-2 mr-2">
+                                    <div class="bg-indigo-600 h-2 rounded-full" style="width: ${progressPercentage}%"></div>
+                                </div>
+                                <span class="text-sm text-slate-600 dark:text-slate-400">${progressPercentage}%</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-slate-900 dark:text-slate-100">
+                            ${quizCount} 次
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                maxScore >= 90 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                                maxScore >= 70 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                            }">
+                                ${maxScore}%
+                            </span>
+                        </td>
+                        <td class="px-4 py-4 whitespace-nowrap text-sm text-slate-600 dark:text-slate-400">
+                            ${lastActivity}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // 更新图表
+        function updateCharts(users) {
+            updateProgressChart(users);
+            updateChapterCompletion(users);
+        }
+
+        // 更新学习进度分布图
+        function updateProgressChart(users) {
+            const ctx = document.getElementById('progress-chart').getContext('2d');
+            
+            // 按进度分组
+            const progressGroups = {
+                '0-25%': 0,
+                '26-50%': 0,
+                '51-75%': 0,
+                '76-99%': 0,
+                '100%': 0
+            };
+
+            users.forEach(user => {
+                const percentage = adminData.getUserProgressPercentage(user.progress);
+                if (percentage === 0) progressGroups['0-25%']++;
+                else if (percentage <= 25) progressGroups['0-25%']++;
+                else if (percentage <= 50) progressGroups['26-50%']++;
+                else if (percentage <= 75) progressGroups['51-75%']++;
+                else if (percentage < 100) progressGroups['76-99%']++;
+                else progressGroups['100%']++;
+            });
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(progressGroups),
+                    datasets: [{
+                        data: Object.values(progressGroups),
+                        backgroundColor: [
+                            '#ef4444', // red
+                            '#f97316', // orange
+                            '#eab308', // yellow
+                            '#22c55e', // green
+                            '#3b82f6'  // blue
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 更新章节完成度
+        function updateChapterCompletion(users) {
+            const container = document.getElementById('chapter-completion');
+            
+            const chapterStats = chapters.map(chapter => {
+                const completedUsers = users.filter(user => 
+                    user.progress[chapter.id] && user.progress[chapter.id].completed
+                ).length;
+                const percentage = users.length > 0 ? Math.round((completedUsers / users.length) * 100) : 0;
+                
+                return {
+                    title: chapter.title,
+                    completed: completedUsers,
+                    total: users.length,
+                    percentage: percentage
+                };
+            });
+
+            container.innerHTML = chapterStats.map(stat => `
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-slate-700 dark:text-slate-300">${stat.title}</span>
+                    <div class="flex items-center">
+                        <div class="w-20 bg-slate-200 dark:bg-slate-700 rounded-full h-2 mr-2">
+                            <div class="bg-indigo-600 h-2 rounded-full" style="width: ${stat.percentage}%"></div>
+                        </div>
+                        <span class="text-xs text-slate-500 dark:text-slate-400 w-8">${stat.percentage}%</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 主题切换
+        function setupTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                html.classList.add('dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 初始化
+        initAdmin();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIEC 职场素养中心 - 登录</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group input:focus + label,
+        .input-group input:not(:placeholder-shown) + label {
+            transform: translateY(-1.5rem) scale(0.8);
+            color: #667eea;
+        }
+        .input-group label {
+            position: absolute;
+            top: 0.75rem;
+            left: 1rem;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl shadow-2xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="bg-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-brain text-white text-2xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-2">AIEC 职场素养中心</h1>
+            <p class="text-gray-200">欢迎来到学习平台</p>
+        </div>
+
+        <!-- 角色选择 -->
+        <div class="mb-6">
+            <div class="flex bg-white/10 rounded-lg p-1">
+                <button id="employee-tab" class="flex-1 py-2 px-4 rounded-md text-white font-medium transition-all duration-200 bg-indigo-600">
+                    新员工
+                </button>
+                <button id="admin-tab" class="flex-1 py-2 px-4 rounded-md text-white font-medium transition-all duration-200 hover:bg-white/10">
+                    管理员
+                </button>
+            </div>
+        </div>
+
+        <!-- 登录表单 -->
+        <form id="login-form" class="space-y-6">
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="username" 
+                    placeholder=" "
+                    class="w-full px-4 py-3 bg-white/10 rounded-lg text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-white/20"
+                    required
+                >
+                <label for="username" class="text-gray-200">用户名</label>
+            </div>
+
+            <div class="input-group">
+                <input 
+                    type="password" 
+                    id="password" 
+                    placeholder=" "
+                    class="w-full px-4 py-3 bg-white/10 rounded-lg text-white placeholder-transparent focus:outline-none focus:ring-2 focus:ring-indigo-500 border border-white/20"
+                    required
+                >
+                <label for="password" class="text-gray-200">密码</label>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <label class="flex items-center">
+                    <input type="checkbox" class="mr-2 rounded">
+                    <span class="text-gray-200 text-sm">记住我</span>
+                </label>
+                <a href="#" class="text-indigo-300 hover:text-indigo-200 text-sm">忘记密码？</a>
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+                登录
+            </button>
+        </form>
+
+        <!-- 注册链接 -->
+        <div class="text-center mt-6">
+            <p class="text-gray-200">
+                还没有账户？
+                <a href="#" id="register-link" class="text-indigo-300 hover:text-indigo-200 font-medium">立即注册</a>
+            </p>
+        </div>
+
+        <!-- 测试账户信息 -->
+        <div class="mt-8 p-4 bg-white/5 rounded-lg">
+            <h3 class="text-white font-medium mb-2">测试账户:</h3>
+            <div class="text-gray-300 text-sm space-y-1">
+                <p><strong>新员工:</strong> employee/123456</p>
+                <p><strong>管理员:</strong> admin/admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 角色切换
+        const employeeTab = document.getElementById('employee-tab');
+        const adminTab = document.getElementById('admin-tab');
+        let currentRole = 'employee';
+
+        employeeTab.addEventListener('click', () => {
+            currentRole = 'employee';
+            employeeTab.classList.add('bg-indigo-600');
+            employeeTab.classList.remove('hover:bg-white/10');
+            adminTab.classList.remove('bg-indigo-600');
+            adminTab.classList.add('hover:bg-white/10');
+        });
+
+        adminTab.addEventListener('click', () => {
+            currentRole = 'admin';
+            adminTab.classList.add('bg-indigo-600');
+            adminTab.classList.remove('hover:bg-white/10');
+            employeeTab.classList.remove('bg-indigo-600');
+            employeeTab.classList.add('hover:bg-white/10');
+        });
+
+        // 登录处理
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // 简单的验证逻辑
+            if (currentRole === 'employee') {
+                if (username === 'employee' && password === '123456') {
+                    localStorage.setItem('userRole', 'employee');
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('loginTime', new Date().toISOString());
+                    alert('登录成功！');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('用户名或密码错误！');
+                }
+            } else {
+                if (username === 'admin' && password === 'admin123') {
+                    localStorage.setItem('userRole', 'admin');
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('loginTime', new Date().toISOString());
+                    alert('管理员登录成功！');
+                    window.location.href = 'admin.html';
+                } else {
+                    alert('管理员用户名或密码错误！');
+                }
+            }
+        });
+
+        // 注册链接
+        document.getElementById('register-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('注册功能正在开发中...');
+        });
+    </script>
+</body>
+</html> 

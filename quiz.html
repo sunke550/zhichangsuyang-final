@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIEC AI 智能测验</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .chat-message {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .typing-indicator {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- 顶部导航 -->
+        <div class="glass-card rounded-lg p-4 mb-6 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-indigo-600 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-robot text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">AI 智能测验助手</h1>
+                    <p class="text-gray-200 text-sm">个性化学习评估</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <a href="index.html" class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    <i class="fas fa-home mr-2"></i>返回学习
+                </a>
+                <button id="logout-btn" class="bg-red-500/20 text-red-300 px-4 py-2 rounded-lg hover:bg-red-500/30 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>退出
+                </button>
+            </div>
+        </div>
+
+        <!-- 主要内容区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 左侧：章节选择 -->
+            <div class="lg:col-span-1">
+                <div class="glass-card rounded-lg p-6">
+                    <h2 class="text-lg font-bold text-white mb-4">
+                        <i class="fas fa-list-ul mr-2"></i>选择测验章节
+                    </h2>
+                    <div id="chapter-list" class="space-y-2">
+                        <!-- 章节列表将通过JavaScript生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：AI对话测验 -->
+            <div class="lg:col-span-2">
+                <div class="glass-card rounded-lg p-6 h-[600px] flex flex-col">
+                    <!-- 对话历史 -->
+                    <div id="chat-history" class="flex-1 overflow-y-auto mb-4 space-y-4">
+                        <div class="chat-message bg-blue-500/20 rounded-lg p-4 text-white">
+                            <div class="flex items-center mb-2">
+                                <i class="fas fa-robot text-blue-300 mr-2"></i>
+                                <span class="font-medium">AI 助手</span>
+                            </div>
+                            <p>你好！我是你的AI学习助手。请选择一个章节，我会为你生成个性化的测验题目。</p>
+                        </div>
+                    </div>
+
+                    <!-- 输入区域 -->
+                    <div class="flex space-x-2">
+                        <input 
+                            type="text" 
+                            id="user-input" 
+                            placeholder="输入你的答案或问题..."
+                            class="flex-1 px-4 py-2 bg-white/10 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            disabled
+                        >
+                        <button 
+                            id="send-btn" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors disabled:opacity-50"
+                            disabled
+                        >
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户验证
+        const userRole = localStorage.getItem('userRole');
+        const username = localStorage.getItem('username');
+        
+        if (!userRole || !username) {
+            alert('请先登录！');
+            window.location.href = 'login.html';
+        }
+
+        // 章节数据
+        const chapters = [
+            { id: 'strategy', title: '战略进化蓝图', description: '从AI教练到战略引擎' },
+            { id: 'newcomer', title: '新人职场素养', description: '凡事有回应的四个层次' },
+            { id: 'principles', title: '第一工作原则', description: '机制优于意愿' },
+            { id: 'growth_pillars', title: '成长四大支柱', description: '四轮驱动的成长生态' },
+            { id: 'growth_model', title: '团队成长模型', description: '价值交换与环境策略' },
+            { id: 'product_dev', title: '产品学科化建设', description: '拥抱AI增量' },
+            { id: 'mindset', title: '组织心法', description: '在变化中保持稳定' }
+        ];
+
+        // 题目数据库（模拟AI生成的问题）
+        const questionBank = {
+            strategy: [
+                {
+                    question: "AIEC的两条核心业务线是什么？它们之间的关系是什么？",
+                    type: "essay",
+                    points: 10,
+                    keywords: ["组织AI化", "商业化", "内功", "江湖", "互为因果"]
+                },
+                {
+                    question: "组织AI化包含哪三个层面的深度融合？",
+                    type: "multiple",
+                    options: ["个体AI原生", "协同AI增效", "流程AI变革", "产品AI化"],
+                    correct: [0, 1, 2],
+                    points: 8
+                }
+            ],
+            newcomer: [
+                {
+                    question: "\"凡事有回应\"的四个层次分别是什么？请简要说明每个层次的特点。",
+                    type: "essay",
+                    points: 12,
+                    keywords: ["及格", "优秀", "专业", "卓越", "基础响应", "主动澄清", "过程同步", "结果闭环"]
+                },
+                {
+                    question: "当领导说\"你看着办\"时，你应该如何回应？",
+                    type: "single",
+                    options: [
+                        "直接按自己的想法去做",
+                        "回复\"好的，我的理解是[方案]，如有偏差请告知\"",
+                        "什么都不说，等待进一步指示",
+                        "询问具体应该怎么做"
+                    ],
+                    correct: 1,
+                    points: 6
+                }
+            ],
+            principles: [
+                {
+                    question: "为什么说\"机制优于意愿\"？请从确保成果、根除内耗、实现规模化三个角度分析。",
+                    type: "essay",
+                    points: 15,
+                    keywords: ["确保成果", "根除内耗", "实现规模化", "机制", "意愿", "SOP", "自动化"]
+                }
+            ],
+            growth_pillars: [
+                {
+                    question: "团队成长的四大支柱分别是什么？",
+                    type: "multiple",
+                    options: ["责任项目", "资深辅导", "AI赋能", "同伴学习", "个人努力"],
+                    correct: [0, 1, 2, 3],
+                    points: 8
+                }
+            ],
+            growth_model: [
+                {
+                    question: "AIEC团队的核心契约是什么？",
+                    type: "single",
+                    options: ["无条件服从", "价值交换", "友好合作", "共同成长"],
+                    correct: 1,
+                    points: 5
+                }
+            ],
+            product_dev: [
+                {
+                    question: "产品学科化建设的三轴拆解法包括哪三个轴？",
+                    type: "essay",
+                    points: 10,
+                    keywords: ["技能轴", "工具轴", "场景轴", "Skill", "Tool", "Scenario"]
+                }
+            ],
+            mindset: [
+                {
+                    question: "组织中哪些是变量，哪些是常量？为什么要这样区分？",
+                    type: "essay",
+                    points: 12,
+                    keywords: ["变量", "常量", "团队工作方式", "认知决策", "外部环境", "团队心态", "领导承诺"]
+                }
+            ]
+        };
+
+        // 当前测验状态
+        let currentChapter = null;
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let isQuizActive = false;
+
+        // 初始化页面
+        function init() {
+            renderChapterList();
+            setupEventListeners();
+        }
+
+        // 渲染章节列表
+        function renderChapterList() {
+            const chapterList = document.getElementById('chapter-list');
+            chapterList.innerHTML = chapters.map(chapter => `
+                <div class="chapter-item p-3 bg-white/10 rounded-lg cursor-pointer hover:bg-white/20 transition-colors" 
+                     data-chapter="${chapter.id}">
+                    <h3 class="font-medium text-white">${chapter.title}</h3>
+                    <p class="text-gray-300 text-sm">${chapter.description}</p>
+                </div>
+            `).join('');
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 章节选择
+            document.getElementById('chapter-list').addEventListener('click', (e) => {
+                const chapterItem = e.target.closest('.chapter-item');
+                if (chapterItem) {
+                    const chapterId = chapterItem.dataset.chapter;
+                    startQuiz(chapterId);
+                }
+            });
+
+            // 发送消息
+            document.getElementById('send-btn').addEventListener('click', sendMessage);
+            document.getElementById('user-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // 退出登录
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('确定要退出登录吗？')) {
+                    localStorage.removeItem('userRole');
+                    localStorage.removeItem('username');
+                    localStorage.removeItem('loginTime');
+                    window.location.href = 'login.html';
+                }
+            });
+        }
+
+        // 开始测验
+        function startQuiz(chapterId) {
+            currentChapter = chapterId;
+            currentQuestions = questionBank[chapterId] || [];
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            isQuizActive = true;
+
+            // 启用输入
+            document.getElementById('user-input').disabled = false;
+            document.getElementById('send-btn').disabled = false;
+
+            // 显示开始消息
+            const chapterTitle = chapters.find(c => c.id === chapterId).title;
+            addAIMessage(`很好！让我们开始《${chapterTitle}》的测验。我会问你${currentQuestions.length}道题。准备好了吗？`);
+
+            // 显示第一题
+            setTimeout(() => {
+                showNextQuestion();
+            }, 1000);
+        }
+
+        // 显示下一题
+        function showNextQuestion() {
+            if (currentQuestionIndex < currentQuestions.length) {
+                const question = currentQuestions[currentQuestionIndex];
+                let questionText = `**第${currentQuestionIndex + 1}题** (${question.points}分)\n\n${question.question}`;
+                
+                if (question.type === 'multiple' || question.type === 'single') {
+                    questionText += '\n\n选项：';
+                    question.options.forEach((option, index) => {
+                        questionText += `\n${String.fromCharCode(65 + index)}. ${option}`;
+                    });
+                }
+                
+                addAIMessage(questionText);
+            } else {
+                // 测验完成
+                finishQuiz();
+            }
+        }
+
+        // 发送消息
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // 添加用户消息
+            addUserMessage(message);
+            input.value = '';
+
+            if (isQuizActive) {
+                // 处理答案
+                processAnswer(message);
+            }
+        }
+
+        // 处理答案
+        function processAnswer(answer) {
+            const question = currentQuestions[currentQuestionIndex];
+            userAnswers.push({
+                question: question.question,
+                answer: answer,
+                correct: evaluateAnswer(question, answer)
+            });
+
+            // 给出反馈
+            const isCorrect = userAnswers[userAnswers.length - 1].correct;
+            const feedback = generateFeedback(question, answer, isCorrect);
+            
+            setTimeout(() => {
+                addAIMessage(feedback);
+                currentQuestionIndex++;
+                
+                // 短暂延迟后显示下一题
+                setTimeout(() => {
+                    showNextQuestion();
+                }, 1500);
+            }, 1000);
+        }
+
+        // 评估答案
+        function evaluateAnswer(question, answer) {
+            if (question.type === 'essay') {
+                // 简单的关键词匹配
+                const keywords = question.keywords || [];
+                const answerLower = answer.toLowerCase();
+                const matchCount = keywords.filter(keyword => 
+                    answerLower.includes(keyword.toLowerCase())
+                ).length;
+                return matchCount >= keywords.length * 0.6; // 60%的关键词匹配
+            } else if (question.type === 'single') {
+                const answerIndex = answer.toUpperCase().charCodeAt(0) - 65;
+                return answerIndex === question.correct;
+            } else if (question.type === 'multiple') {
+                // 简化处理：检查是否包含正确答案的字母
+                const correctLetters = question.correct.map(i => String.fromCharCode(65 + i));
+                return correctLetters.some(letter => answer.toUpperCase().includes(letter));
+            }
+            return false;
+        }
+
+        // 生成反馈
+        function generateFeedback(question, answer, isCorrect) {
+            const encouragements = [
+                "很好！", "不错！", "正确！", "太棒了！", "答得很好！"
+            ];
+            const corrections = [
+                "答案不够完整，", "这个答案需要补充，", "让我来帮你梳理一下，"
+            ];
+
+            if (isCorrect) {
+                return `${encouragements[Math.floor(Math.random() * encouragements.length)]} 你的回答很到位，得分：${question.points}分`;
+            } else {
+                return `${corrections[Math.floor(Math.random() * corrections.length)]} 继续努力！得分：${Math.floor(question.points * 0.5)}分`;
+            }
+        }
+
+        // 完成测验
+        function finishQuiz() {
+            isQuizActive = false;
+            document.getElementById('user-input').disabled = true;
+            document.getElementById('send-btn').disabled = true;
+
+            // 计算总分
+            const totalScore = userAnswers.reduce((sum, answer, index) => {
+                const baseScore = currentQuestions[index].points;
+                return sum + (answer.correct ? baseScore : Math.floor(baseScore * 0.5));
+            }, 0);
+
+            const maxScore = currentQuestions.reduce((sum, q) => sum + q.points, 0);
+            const percentage = Math.round((totalScore / maxScore) * 100);
+
+            // 保存测验结果
+            saveQuizResult(currentChapter, totalScore, maxScore, percentage);
+
+            // 显示结果
+            setTimeout(() => {
+                addAIMessage(`🎉 测验完成！\n\n你的成绩：${totalScore}/${maxScore}分 (${percentage}%)\n\n${getGradeComment(percentage)}\n\n点击其他章节继续测验，或返回学习页面继续学习。`);
+            }, 1000);
+        }
+
+        // 获取成绩评语
+        function getGradeComment(percentage) {
+            if (percentage >= 90) return "🌟 优秀！你对这个章节掌握得很好！";
+            if (percentage >= 80) return "👍 良好！稍加复习就能达到优秀水平！";
+            if (percentage >= 70) return "📚 及格！建议重新学习相关内容。";
+            return "💪 需要努力！请回到学习页面重新学习这个章节。";
+        }
+
+        // 保存测验结果
+        function saveQuizResult(chapterId, score, maxScore, percentage) {
+            const results = JSON.parse(localStorage.getItem(`quiz_results_${username}`) || '{}');
+            results[chapterId] = {
+                score: score,
+                maxScore: maxScore,
+                percentage: percentage,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem(`quiz_results_${username}`, JSON.stringify(results));
+        }
+
+        // 添加AI消息
+        function addAIMessage(message) {
+            const chatHistory = document.getElementById('chat-history');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message bg-blue-500/20 rounded-lg p-4 text-white';
+            messageDiv.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-robot text-blue-300 mr-2"></i>
+                    <span class="font-medium">AI 助手</span>
+                </div>
+                <p class="whitespace-pre-line">${message}</p>
+            `;
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // 添加用户消息
+        function addUserMessage(message) {
+            const chatHistory = document.getElementById('chat-history');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message bg-green-500/20 rounded-lg p-4 text-white ml-8';
+            messageDiv.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <i class="fas fa-user text-green-300 mr-2"></i>
+                    <span class="font-medium">${username}</span>
+                </div>
+                <p class="whitespace-pre-line">${message}</p>
+            `;
+            chatHistory.appendChild(messageDiv);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html> 
