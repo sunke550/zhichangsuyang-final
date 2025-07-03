@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 配置中心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .config-status {
+            transition: all 0.3s ease;
+        }
+        .config-status.connected {
+            border-color: #10b981;
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+        .config-status.error {
+            border-color: #ef4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- 顶部导航 -->
+        <div class="glass-card rounded-lg p-4 mb-6 flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-indigo-600 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                    <i class="fas fa-cog text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-white">AI 配置中心</h1>
+                    <p class="text-gray-200 text-sm">配置智能测验AI助手</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <a href="quiz.html" class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    <i class="fas fa-brain mr-2"></i>测验中心
+                </a>
+                <a href="index.html" class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition-colors">
+                    <i class="fas fa-home mr-2"></i>返回学习
+                </a>
+            </div>
+        </div>
+
+        <!-- API 配置 -->
+        <div class="glass-card rounded-lg p-6 mb-6">
+            <h2 class="text-lg font-bold text-white mb-4">
+                <i class="fas fa-key mr-2"></i>OpenAI API 配置
+            </h2>
+            
+            <div class="mb-4">
+                <label class="block text-gray-200 text-sm font-medium mb-2">API Key</label>
+                <input 
+                    type="password" 
+                    id="api-key" 
+                    placeholder="输入您的OpenAI API Key..."
+                    class="w-full px-4 py-2 bg-white/10 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-white/20"
+                >
+                <p class="text-gray-300 text-xs mt-1">API Key会安全存储在本地浏览器中</p>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-200 text-sm font-medium mb-2">AI 模型</label>
+                <select id="ai-model" class="w-full px-4 py-2 bg-white/10 rounded-lg text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo (推荐)</option>
+                    <option value="gpt-4">GPT-4 (高质量)</option>
+                </select>
+            </div>
+
+            <button id="test-connection" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors mb-4">
+                <i class="fas fa-plug mr-2"></i>测试连接
+            </button>
+
+            <div id="connection-status" class="p-4 rounded-lg border border-gray-400">
+                <div class="flex items-center">
+                    <i class="fas fa-circle text-gray-400 mr-2"></i>
+                    <span class="text-gray-200">未连接</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试区域 -->
+        <div class="glass-card rounded-lg p-6">
+            <h2 class="text-lg font-bold text-white mb-4">
+                <i class="fas fa-flask mr-2"></i>AI 测试区域
+            </h2>
+            
+            <div class="mb-4">
+                <label class="block text-gray-200 text-sm font-medium mb-2">测试章节内容</label>
+                <textarea 
+                    id="test-content" 
+                    placeholder="粘贴一段章节内容，让AI生成测试题..."
+                    class="w-full px-4 py-2 bg-white/10 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 border border-white/20 h-32"
+                ></textarea>
+            </div>
+            
+            <button id="generate-test-question" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors mb-4">
+                <i class="fas fa-magic mr-2"></i>生成测试题
+            </button>
+            
+            <div class="mb-4">
+                <label class="block text-gray-200 text-sm font-medium mb-2">AI 生成结果</label>
+                <div id="test-result" class="w-full px-4 py-2 bg-white/5 rounded-lg text-gray-300 border border-white/20 h-32 overflow-y-auto text-sm">
+                    配置AI后可在此测试问题生成效果...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 用户验证
+        const userRole = localStorage.getItem('userRole');
+        const username = localStorage.getItem('username');
+        
+        if (!userRole) {
+            alert('请先登录！');
+            window.location.href = 'login.html';
+        }
+
+        // AI配置管理
+        const aiConfig = {
+            getConfig: function() {
+                return JSON.parse(localStorage.getItem('ai_config') || '{}');
+            },
+            
+            saveConfig: function(config) {
+                localStorage.setItem('ai_config', JSON.stringify(config));
+            },
+            
+            callAI: async function(message, apiKey, model) {
+                if (!apiKey) {
+                    throw new Error('API Key未配置');
+                }
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: '你是一位专业的职场培训师，擅长根据学习内容生成高质量的测验问题。'
+                            },
+                            {
+                                role: 'user',
+                                content: message
+                            }
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
+        };
+        
+        // 测试连接
+        document.getElementById('test-connection').addEventListener('click', async () => {
+            const apiKey = document.getElementById('api-key').value;
+            const model = document.getElementById('ai-model').value;
+            const statusEl = document.getElementById('connection-status');
+            const testBtn = document.getElementById('test-connection');
+            
+            if (!apiKey.trim()) {
+                updateConnectionStatus('error', '请输入API Key');
+                return;
+            }
+            
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>测试中...';
+            updateConnectionStatus('testing', '正在测试连接...');
+            
+            try {
+                const response = await aiConfig.callAI('请回复"连接成功"', apiKey, model);
+                
+                if (response.includes('连接成功')) {
+                    updateConnectionStatus('connected', 'AI连接成功！');
+                    // 保存配置
+                    aiConfig.saveConfig({ apiKey, model });
+                } else {
+                    updateConnectionStatus('error', 'API响应异常');
+                }
+            } catch (error) {
+                updateConnectionStatus('error', `连接失败: ${error.message}`);
+            } finally {
+                testBtn.disabled = false;
+                testBtn.innerHTML = '<i class="fas fa-plug mr-2"></i>测试连接';
+            }
+        });
+        
+        // 更新连接状态
+        function updateConnectionStatus(status, message) {
+            const statusEl = document.getElementById('connection-status');
+            
+            let className = 'p-4 rounded-lg border ';
+            let iconClass, iconColor;
+            
+            switch (status) {
+                case 'connected':
+                    className += 'border-green-500 bg-green-500/10';
+                    iconClass = 'fas fa-check-circle';
+                    iconColor = 'text-green-400';
+                    break;
+                case 'error':
+                    className += 'border-red-500 bg-red-500/10';
+                    iconClass = 'fas fa-times-circle';
+                    iconColor = 'text-red-400';
+                    break;
+                case 'testing':
+                    className += 'border-blue-500 bg-blue-500/10';
+                    iconClass = 'fas fa-spinner fa-spin';
+                    iconColor = 'text-blue-400';
+                    break;
+                default:
+                    className += 'border-gray-400';
+                    iconClass = 'fas fa-circle';
+                    iconColor = 'text-gray-400';
+            }
+            
+            statusEl.className = className;
+            statusEl.innerHTML = `
+                <div class="flex items-center">
+                    <i class="${iconClass} ${iconColor} mr-2"></i>
+                    <span class="text-gray-200">${message}</span>
+                </div>
+            `;
+        }
+        
+        // 生成测试题
+        document.getElementById('generate-test-question').addEventListener('click', async () => {
+            const content = document.getElementById('test-content').value;
+            const resultEl = document.getElementById('test-result');
+            const generateBtn = document.getElementById('generate-test-question');
+            const config = aiConfig.getConfig();
+            
+            if (!content.trim()) {
+                resultEl.textContent = '请输入测试内容';
+                return;
+            }
+            
+            if (!config.apiKey) {
+                resultEl.textContent = '请先配置并测试AI连接';
+                return;
+            }
+            
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>生成中...';
+            resultEl.textContent = '正在生成测试题...';
+            
+            try {
+                const prompt = `基于以下学习内容，生成1道高质量的测验题。要求：
+1. 题目要能检验对核心概念的理解
+2. 如果是选择题，提供4个选项，其中1个正确答案
+3. 如果是问答题，提供参考答案要点
+4. 题目难度适中，适合新员工
+
+学习内容：
+${content}
+
+请生成测验题：`;
+                
+                const response = await aiConfig.callAI(prompt, config.apiKey, config.model);
+                resultEl.textContent = response;
+            } catch (error) {
+                resultEl.textContent = `生成失败: ${error.message}`;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-magic mr-2"></i>生成测试题';
+            }
+        });
+        
+        // 加载已保存的配置
+        const config = aiConfig.getConfig();
+        if (config.apiKey) {
+            document.getElementById('api-key').value = config.apiKey;
+        }
+        if (config.model) {
+            document.getElementById('ai-model').value = config.model;
+        }
+    </script>
+</body>
+</html> 

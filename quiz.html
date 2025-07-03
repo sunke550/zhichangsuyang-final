@@ -78,6 +78,22 @@
 
             <!-- 右侧：AI对话测验 -->
             <div class="lg:col-span-2">
+                <!-- AI配置状态 -->
+                <div id="ai-status" class="mb-4 p-4 rounded-lg border glass-card">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i id="ai-status-icon" class="fas fa-circle text-gray-400 mr-3"></i>
+                            <div>
+                                <h3 id="ai-status-title" class="font-medium text-white">AI状态检查中...</h3>
+                                <p id="ai-status-desc" class="text-sm text-gray-300 mt-1">正在检测AI配置状态</p>
+                            </div>
+                        </div>
+                        <a href="ai-config.html" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                            <i class="fas fa-cog mr-2"></i>配置AI
+                        </a>
+                    </div>
+                </div>
+                
                 <div class="glass-card rounded-lg p-6 h-[600px] flex flex-col">
                     <!-- 对话历史 -->
                     <div id="chat-history" class="flex-1 overflow-y-auto mb-4 space-y-4">
@@ -220,11 +236,101 @@
         let currentQuestionIndex = 0;
         let userAnswers = [];
         let isQuizActive = false;
+        let useRealAI = false;
+
+        // AI配置管理
+        const aiConfig = {
+            getConfig: function() {
+                return JSON.parse(localStorage.getItem('ai_config') || '{}');
+            },
+            
+            callAI: async function(message) {
+                const config = this.getConfig();
+                if (!config.apiKey) {
+                    throw new Error('AI未配置');
+                }
+                
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: config.model || 'gpt-3.5-turbo',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: '你是一位专业的职场培训师，擅长根据学习内容生成高质量的测验问题并评估学员回答。请以友善但专业的语气进行对话。'
+                            },
+                            {
+                                role: 'user',
+                                content: message
+                            }
+                        ],
+                        max_tokens: 1000,
+                        temperature: 0.7
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`AI请求失败: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
+        };
 
         // 初始化页面
         function init() {
+            checkAIStatus();
             renderChapterList();
             setupEventListeners();
+        }
+
+        // 检查AI配置状态
+        function checkAIStatus() {
+            const config = aiConfig.getConfig();
+            const statusIcon = document.getElementById('ai-status-icon');
+            const statusTitle = document.getElementById('ai-status-title');
+            const statusDesc = document.getElementById('ai-status-desc');
+            
+            if (config.apiKey) {
+                // 测试AI连接
+                aiConfig.callAI('测试连接').then(() => {
+                    useRealAI = true;
+                    statusIcon.className = 'fas fa-check-circle text-green-400 mr-3';
+                    statusTitle.textContent = 'AI已启用';
+                    statusDesc.textContent = '正在使用真实AI进行智能测验';
+                    updateWelcomeMessage(true);
+                }).catch(() => {
+                    useRealAI = false;
+                    statusIcon.className = 'fas fa-exclamation-triangle text-yellow-400 mr-3';
+                    statusTitle.textContent = 'AI配置有误';
+                    statusDesc.textContent = '使用模拟AI功能，点击右侧配置真实AI';
+                    updateWelcomeMessage(false);
+                });
+            } else {
+                useRealAI = false;
+                statusIcon.className = 'fas fa-times-circle text-red-400 mr-3';
+                statusTitle.textContent = 'AI未配置';
+                statusDesc.textContent = '使用模拟AI功能，点击右侧配置真实AI获得更好体验';
+                updateWelcomeMessage(false);
+            }
+        }
+
+        // 更新欢迎消息
+        function updateWelcomeMessage(hasAI) {
+            const chatHistory = document.getElementById('chat-history');
+            const welcomeMessage = chatHistory.querySelector('.chat-message');
+            const messageText = welcomeMessage.querySelector('p');
+            
+            if (hasAI) {
+                messageText.textContent = '你好！我是你的AI学习助手。请选择一个章节，我会为你生成个性化的测验题目并提供智能反馈。';
+            } else {
+                messageText.textContent = '你好！当前使用模拟AI功能。配置真实AI后可获得更智能的个性化测验体验。请选择一个章节开始测验。';
+            }
         }
 
         // 渲染章节列表
@@ -270,9 +376,8 @@
         }
 
         // 开始测验
-        function startQuiz(chapterId) {
+        async function startQuiz(chapterId) {
             currentChapter = chapterId;
-            currentQuestions = questionBank[chapterId] || [];
             currentQuestionIndex = 0;
             userAnswers = [];
             isQuizActive = true;
@@ -281,14 +386,117 @@
             document.getElementById('user-input').disabled = false;
             document.getElementById('send-btn').disabled = false;
 
-            // 显示开始消息
             const chapterTitle = chapters.find(c => c.id === chapterId).title;
-            addAIMessage(`很好！让我们开始《${chapterTitle}》的测验。我会问你${currentQuestions.length}道题。准备好了吗？`);
+            const chapterDesc = chapters.find(c => c.id === chapterId).description;
 
-            // 显示第一题
-            setTimeout(() => {
-                showNextQuestion();
-            }, 1000);
+            if (useRealAI) {
+                // 使用真实AI
+                addAIMessage(`很好！让我们开始《${chapterTitle}》的智能测验。我会为你生成个性化的问题。准备好了吗？`);
+                
+                // 显示正在生成提示
+                setTimeout(() => {
+                    addAIMessage('🤖 正在为你生成个性化问题...');
+                    generateAIQuestions(chapterTitle, chapterDesc);
+                }, 1000);
+            } else {
+                // 使用预设题目
+                currentQuestions = questionBank[chapterId] || [];
+                addAIMessage(`很好！让我们开始《${chapterTitle}》的测验。我会问你${currentQuestions.length}道题。准备好了吗？`);
+                
+                setTimeout(() => {
+                    showNextQuestion();
+                }, 1000);
+            }
+        }
+
+        // 使用AI生成问题
+        async function generateAIQuestions(chapterTitle, chapterDesc) {
+            try {
+                const prompt = `作为职场培训师，请为《${chapterTitle}》(${chapterDesc})这个章节生成3道测验题。
+
+要求：
+1. 题目要能检验对核心概念的深度理解
+2. 包含不同类型：选择题、判断题、问答题
+3. 难度适中，适合新员工
+4. 请为每道题标明题型和分值
+
+请按以下格式生成：
+【题目1】(选择题/判断题/问答题, X分)
+题目内容...
+如果是选择题，请提供选项A、B、C、D
+
+请开始生成问题：`;
+
+                const response = await aiConfig.callAI(prompt);
+                
+                // 解析AI生成的问题并开始测验
+                currentQuestions = parseAIQuestions(response);
+                addAIMessage(`太好了！我为你生成了${currentQuestions.length}道个性化问题。让我们开始吧！`);
+                
+                setTimeout(() => {
+                    showNextQuestion();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('AI生成问题失败:', error);
+                addAIMessage('AI生成问题时出现错误，切换到预设题目模式。');
+                
+                // 回退到预设题目
+                currentQuestions = questionBank[currentChapter] || [];
+                setTimeout(() => {
+                    showNextQuestion();
+                }, 1000);
+            }
+        }
+
+        // 解析AI生成的问题
+        function parseAIQuestions(aiResponse) {
+            // 简单的解析逻辑，实际项目中可能需要更复杂的解析
+            const questions = [];
+            const lines = aiResponse.split('\n');
+            let currentQuestion = null;
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (line.includes('【题目') && line.includes('】')) {
+                    if (currentQuestion) {
+                        questions.push(currentQuestion);
+                    }
+                    // 解析题目类型和分值
+                    const match = line.match(/【题目\d+】\((.*?),\s*(\d+)分\)/);
+                    const type = match ? match[1] : '问答题';
+                    const points = match ? parseInt(match[2]) : 10;
+                    
+                    currentQuestion = {
+                        question: '',
+                        type: type.includes('选择') ? 'single' : (type.includes('判断') ? 'boolean' : 'essay'),
+                        points: points,
+                        aiGenerated: true,
+                        options: [],
+                        keywords: []
+                    };
+                } else if (currentQuestion && line && !line.startsWith('A.') && !line.startsWith('B.') && !line.startsWith('C.') && !line.startsWith('D.')) {
+                    if (!currentQuestion.question) {
+                        currentQuestion.question = line;
+                    }
+                } else if (currentQuestion && (line.startsWith('A.') || line.startsWith('B.') || line.startsWith('C.') || line.startsWith('D.'))) {
+                    currentQuestion.options.push(line.substring(2).trim());
+                }
+            });
+            
+            if (currentQuestion) {
+                questions.push(currentQuestion);
+            }
+            
+            return questions.length > 0 ? questions : [
+                {
+                    question: "请用你自己的话总结这个章节的核心要点。",
+                    type: "essay",
+                    points: 15,
+                    aiGenerated: true,
+                    keywords: []
+                }
+            ];
         }
 
         // 显示下一题
@@ -329,20 +537,34 @@
         }
 
         // 处理答案
-        function processAnswer(answer) {
+        async function processAnswer(answer) {
             const question = currentQuestions[currentQuestionIndex];
+            
+            // 显示正在评估提示
+            if (useRealAI && question.aiGenerated) {
+                addAIMessage('🤔 正在评估你的答案...');
+            }
+            
+            let evaluation;
+            if (useRealAI && question.aiGenerated) {
+                evaluation = await evaluateWithAI(question, answer);
+            } else {
+                evaluation = {
+                    correct: evaluateAnswer(question, answer),
+                    feedback: generateFeedback(question, answer, evaluateAnswer(question, answer))
+                };
+            }
+            
             userAnswers.push({
                 question: question.question,
                 answer: answer,
-                correct: evaluateAnswer(question, answer)
+                correct: evaluation.correct,
+                score: evaluation.score || (evaluation.correct ? question.points : Math.floor(question.points * 0.5)),
+                feedback: evaluation.feedback
             });
-
-            // 给出反馈
-            const isCorrect = userAnswers[userAnswers.length - 1].correct;
-            const feedback = generateFeedback(question, answer, isCorrect);
             
             setTimeout(() => {
-                addAIMessage(feedback);
+                addAIMessage(evaluation.feedback);
                 currentQuestionIndex++;
                 
                 // 短暂延迟后显示下一题
@@ -350,6 +572,57 @@
                     showNextQuestion();
                 }, 1500);
             }, 1000);
+        }
+
+        // 使用AI评估答案
+        async function evaluateWithAI(question, answer) {
+            try {
+                const prompt = `作为职场培训师，请评估学员对以下问题的回答：
+
+问题：${question.question}
+学员回答：${answer}
+
+请从以下几个方面进行评估：
+1. 回答的准确性和完整性
+2. 是否抓住了核心要点
+3. 表达是否清晰
+
+请给出：
+- 评分（0-${question.points}分）
+- 具体的反馈建议（鼓励性但专业）
+- 如果有需要改进的地方，请指出
+
+请用友善但专业的语气回复，格式为：
+评分：X分
+反馈：[具体反馈内容]`;
+
+                const response = await aiConfig.callAI(prompt);
+                
+                // 解析AI的评估结果
+                const scoreMatch = response.match(/评分[：:]\s*(\d+)/);
+                const score = scoreMatch ? parseInt(scoreMatch[1]) : Math.floor(question.points * 0.7);
+                const correct = score >= question.points * 0.7; // 70%以上算正确
+                
+                // 提取反馈部分
+                const feedbackMatch = response.match(/反馈[：:]\s*([\s\S]*)/);
+                const feedback = feedbackMatch ? feedbackMatch[1].trim() : response;
+                
+                return {
+                    correct: correct,
+                    score: score,
+                    feedback: `得分：${score}/${question.points}分\n\n${feedback}`
+                };
+                
+            } catch (error) {
+                console.error('AI评估失败:', error);
+                // 回退到简单评估
+                const simpleCorrect = evaluateAnswer(question, answer);
+                return {
+                    correct: simpleCorrect,
+                    score: simpleCorrect ? question.points : Math.floor(question.points * 0.5),
+                    feedback: generateFeedback(question, answer, simpleCorrect) + '\n\n(AI评估暂时不可用，使用简单评估)'
+                };
+            }
         }
 
         // 评估答案
@@ -395,10 +668,9 @@
             document.getElementById('user-input').disabled = true;
             document.getElementById('send-btn').disabled = true;
 
-            // 计算总分
-            const totalScore = userAnswers.reduce((sum, answer, index) => {
-                const baseScore = currentQuestions[index].points;
-                return sum + (answer.correct ? baseScore : Math.floor(baseScore * 0.5));
+            // 计算总分（优先使用AI评估的分数）
+            const totalScore = userAnswers.reduce((sum, answer) => {
+                return sum + (answer.score || (answer.correct ? currentQuestions[userAnswers.indexOf(answer)].points : Math.floor(currentQuestions[userAnswers.indexOf(answer)].points * 0.5)));
             }, 0);
 
             const maxScore = currentQuestions.reduce((sum, q) => sum + q.points, 0);
@@ -408,8 +680,12 @@
             saveQuizResult(currentChapter, totalScore, maxScore, percentage);
 
             // 显示结果
+            const resultMessage = useRealAI ? 
+                `🎉 AI智能测验完成！\n\n你的成绩：${totalScore}/${maxScore}分 (${percentage}%)\n\n${getGradeComment(percentage)}\n\n✨ 本次测验使用了AI智能评估，反馈更加精准个性化。\n\n点击其他章节继续测验，或返回学习页面继续学习。` :
+                `🎉 测验完成！\n\n你的成绩：${totalScore}/${maxScore}分 (${percentage}%)\n\n${getGradeComment(percentage)}\n\n💡 提示：配置AI后可获得更智能的个性化测验体验。\n\n点击其他章节继续测验，或返回学习页面继续学习。`;
+
             setTimeout(() => {
-                addAIMessage(`🎉 测验完成！\n\n你的成绩：${totalScore}/${maxScore}分 (${percentage}%)\n\n${getGradeComment(percentage)}\n\n点击其他章节继续测验，或返回学习页面继续学习。`);
+                addAIMessage(resultMessage);
             }, 1000);
         }
 

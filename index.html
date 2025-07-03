@@ -263,6 +263,7 @@
 
                     <li><a href="#aiec-fm" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-broadcast-tower w-6"></i><span>AIEC FM 📻</span></a></li>
                     <li><a href="quiz.html" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-brain w-6"></i><span>AI 智能测验</span></a></li>
+                    <li><a href="ai-config.html" class="sidebar-link flex items-center p-3 rounded-lg text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors duration-200"><i class="fas fa-cog w-6"></i><span>AI 配置中心</span></a></li>
                 </ul>
             </nav>
 
@@ -923,26 +924,186 @@
                 }
             });
             
+            // --- 章节学习要求跟踪 ---
+            const learningRequirements = {
+                // 跟踪每个章节的学习要求完成情况
+                requirements: {
+                    readingTime: 60, // 最少阅读时间（秒）
+                    audioCompleted: true, // 必须听完音频
+                    quizPassed: false // 暂时不强制要求通过测验
+                },
+                
+                // 记录用户在每个章节的学习数据
+                getSectionData: function(sectionId) {
+                    const key = `learning_data_${username}_${sectionId}`;
+                    return JSON.parse(localStorage.getItem(key) || '{}');
+                },
+                
+                // 保存章节学习数据
+                saveSectionData: function(sectionId, data) {
+                    const key = `learning_data_${username}_${sectionId}`;
+                    const existing = this.getSectionData(sectionId);
+                    const updated = { ...existing, ...data };
+                    localStorage.setItem(key, JSON.stringify(updated));
+                },
+                
+                // 检查是否满足完成条件
+                checkCompletionRequirements: function(sectionId) {
+                    const data = this.getSectionData(sectionId);
+                    const requirements = [];
+                    
+                    // 检查阅读时间
+                    const readingTime = data.totalReadingTime || 0;
+                    if (readingTime < this.requirements.readingTime) {
+                        requirements.push(`需要继续阅读 ${this.requirements.readingTime - readingTime} 秒`);
+                    }
+                    
+                    // 检查音频完成
+                    if (this.requirements.audioCompleted && !data.audioCompleted) {
+                        requirements.push('需要听完音频内容');
+                    }
+                    
+                    // 检查测验通过（如果启用）
+                    if (this.requirements.quizPassed) {
+                        const quizResults = JSON.parse(localStorage.getItem(`quiz_results_${username}`) || '{}');
+                        if (!quizResults[sectionId] || quizResults[sectionId].percentage < 70) {
+                            requirements.push('需要通过章节测验（70分以上）');
+                        }
+                    }
+                    
+                    return requirements;
+                }
+            };
+            
             // --- 章节访问跟踪 ---
             const trackSectionVisit = (sectionId) => {
                 learningProgress.saveProgress(sectionId, false);
                 
-                // 为每个章节添加完成按钮
+                // 开始计时阅读时间
+                let startTime = Date.now();
+                let readingTimer = null;
+                
+                // 为每个章节添加学习进度和完成按钮
                 const section = document.getElementById(sectionId);
-                if (section && !section.querySelector('.complete-btn')) {
+                if (section && !section.querySelector('.learning-tracker')) {
+                    // 创建学习跟踪容器
+                    const trackerDiv = document.createElement('div');
+                    trackerDiv.className = 'learning-tracker mt-6 p-4 bg-slate-100 dark:bg-slate-800 rounded-lg border';
+                    
+                    // 学习要求检查列表
+                    const requirementsList = document.createElement('div');
+                    requirementsList.className = 'requirements-list mb-4';
+                    requirementsList.innerHTML = `
+                        <h4 class="font-medium text-slate-800 dark:text-slate-200 mb-2">
+                            <i class="fas fa-tasks mr-2"></i>学习要求完成情况:
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div id="reading-time-${sectionId}" class="flex items-center">
+                                <i class="fas fa-clock text-yellow-500 mr-2"></i>
+                                <span>阅读时间: <span class="font-medium">0</span>/${learningRequirements.requirements.readingTime}秒</span>
+                                <i class="fas fa-times text-red-500 ml-2" id="reading-status-${sectionId}"></i>
+                            </div>
+                            <div id="audio-status-${sectionId}" class="flex items-center">
+                                <i class="fas fa-headphones text-blue-500 mr-2"></i>
+                                <span>音频学习: 未完成</span>
+                                <i class="fas fa-times text-red-500 ml-2"></i>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 完成按钮
                     const completeBtn = document.createElement('button');
-                    completeBtn.className = 'complete-btn mt-6 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200';
-                    completeBtn.innerHTML = '<i class="fas fa-check mr-2"></i>标记为已完成';
-                    completeBtn.addEventListener('click', () => {
-                        learningProgress.saveProgress(sectionId, true);
-                        completeBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>已完成';
-                        completeBtn.disabled = true;
-                        completeBtn.className = 'complete-btn mt-6 bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed';
+                    completeBtn.className = 'complete-btn w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed';
+                    completeBtn.innerHTML = '<i class="fas fa-lock mr-2"></i>请完成所有学习要求';
+                    completeBtn.disabled = true;
+                    
+                    trackerDiv.appendChild(requirementsList);
+                    trackerDiv.appendChild(completeBtn);
+                    section.appendChild(trackerDiv);
+                    
+                    // 阅读时间计时器
+                    readingTimer = setInterval(() => {
+                        const currentTime = Date.now();
+                        const elapsed = Math.floor((currentTime - startTime) / 1000);
+                        
+                        // 更新显示
+                        const readingTimeEl = document.querySelector(`#reading-time-${sectionId} span`);
+                        const readingStatusEl = document.getElementById(`reading-status-${sectionId}`);
+                        
+                        if (readingTimeEl) {
+                            readingTimeEl.textContent = Math.min(elapsed, learningRequirements.requirements.readingTime);
+                        }
+                        
+                        // 保存阅读时间
+                        learningRequirements.saveSectionData(sectionId, {
+                            totalReadingTime: elapsed,
+                            lastUpdateTime: new Date().toISOString()
+                        });
+                        
+                        // 检查完成条件
+                        updateCompletionStatus(sectionId, completeBtn);
+                        
+                        // 如果达到最大时间，停止计时
+                        if (elapsed >= learningRequirements.requirements.readingTime) {
+                            if (readingStatusEl) {
+                                readingStatusEl.className = 'fas fa-check text-green-500 ml-2';
+                            }
+                        }
+                    }, 1000);
+                    
+                    // 页面离开时停止计时
+                    window.addEventListener('beforeunload', () => {
+                        if (readingTimer) clearInterval(readingTimer);
                     });
                     
-                    section.appendChild(completeBtn);
+                    // 完成按钮点击事件
+                    completeBtn.addEventListener('click', () => {
+                        const unmetRequirements = learningRequirements.checkCompletionRequirements(sectionId);
+                        if (unmetRequirements.length === 0) {
+                            learningProgress.saveProgress(sectionId, true);
+                            completeBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>已完成学习';
+                            completeBtn.disabled = true;
+                            completeBtn.className = 'complete-btn w-full bg-green-500 text-white font-bold py-2 px-4 rounded-lg cursor-not-allowed';
+                            
+                            // 显示完成庆祝
+                            showCompletionCelebration(sectionId);
+                        }
+                    });
                 }
             };
+            
+            // 更新完成状态
+            function updateCompletionStatus(sectionId, completeBtn) {
+                const unmetRequirements = learningRequirements.checkCompletionRequirements(sectionId);
+                
+                if (unmetRequirements.length === 0) {
+                    completeBtn.disabled = false;
+                    completeBtn.className = 'complete-btn w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-200';
+                    completeBtn.innerHTML = '<i class="fas fa-check mr-2"></i>完成本章学习';
+                } else {
+                    completeBtn.innerHTML = `<i class="fas fa-lock mr-2"></i>还需完成: ${unmetRequirements[0]}`;
+                }
+            }
+            
+            // 显示完成庆祝动画
+            function showCompletionCelebration(sectionId) {
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg z-50 transform animate-bounce';
+                toast.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-trophy text-yellow-300 text-xl mr-3"></i>
+                        <div>
+                            <p class="font-bold">恭喜完成学习！</p>
+                            <p class="text-sm">您可以前往测验检验学习成果</p>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    toast.remove();
+                }, 5000);
+            }
             
             // --- 音频播放跟踪 ---
             const trackAudioProgress = () => {
@@ -953,17 +1114,53 @@
                         const section = audio.closest('.content-section');
                         if (section) {
                             const sectionId = section.id;
-                            learningProgress.saveProgress(sectionId, false);
+                            
+                            // 保存音频完成状态
+                            learningRequirements.saveSectionData(sectionId, {
+                                audioCompleted: true,
+                                audioCompletionTime: new Date().toISOString()
+                            });
+                            
+                            // 更新UI显示
+                            const audioStatusEl = document.getElementById(`audio-status-${sectionId}`);
+                            if (audioStatusEl) {
+                                audioStatusEl.innerHTML = `
+                                    <i class="fas fa-headphones text-blue-500 mr-2"></i>
+                                    <span>音频学习: 已完成</span>
+                                    <i class="fas fa-check text-green-500 ml-2"></i>
+                                `;
+                            }
+                            
+                            // 检查完成条件并更新按钮状态
+                            const completeBtn = section.querySelector('.complete-btn');
+                            if (completeBtn) {
+                                updateCompletionStatus(sectionId, completeBtn);
+                            }
                             
                             // 显示音频完成提示
                             const toast = document.createElement('div');
                             toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
-                            toast.innerHTML = '<i class="fas fa-check mr-2"></i>音频播放完成！';
+                            toast.innerHTML = '<i class="fas fa-check mr-2"></i>音频播放完成！学习要求更新';
                             document.body.appendChild(toast);
                             
                             setTimeout(() => {
                                 toast.remove();
                             }, 3000);
+                        }
+                    });
+                    
+                    // 监听音频播放进度
+                    audio.addEventListener('timeupdate', () => {
+                        const section = audio.closest('.content-section');
+                        if (section) {
+                            const sectionId = section.id;
+                            const progress = (audio.currentTime / audio.duration) * 100;
+                            
+                            // 保存播放进度
+                            learningRequirements.saveSectionData(sectionId, {
+                                audioProgress: progress,
+                                lastAudioTime: audio.currentTime
+                            });
                         }
                     });
                 });
